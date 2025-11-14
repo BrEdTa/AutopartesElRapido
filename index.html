@@ -463,6 +463,61 @@
 
     }
 
+    /* ============================
+       TOASTS / NOTIFICACIONES
+       ============================ */
+    #toastContainer {
+      position: fixed;
+      right: 15px;
+      bottom: 15px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toast {
+      min-width: 220px;
+      max-width: 320px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: toast-in 0.2s forwards;
+    }
+    .toast button {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      margin-left: 8px;
+      padding: 0;
+    }
+    .toast-success { background: #28a745; }
+    .toast-info    { background: #17a2b8; }
+    .toast-warn    { background: #ffc107; color: #222; }
+    .toast-error   { background: #dc3545; }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes toast-out {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(10px); }
+    }
+    @media (max-width: 600px) {
+      #toastContainer {
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+      }
+    }
   </style>
 
 </head>
@@ -705,13 +760,17 @@
 
         <li><strong>Ganancia neta:</strong> <span id="resGananciaNeta">0.00</span></li>
 
+        <li><strong>Ganancia de hoy:</strong> <span id="resGananciaHoy">0.00</span></li>
+        <li><strong>Ganancia de ayer:</strong> <span id="resGananciaAyer">0.00</span></li>
+
       </ul>
 
     </div>
 
   </div>
 
-
+  <!-- TOASTS -->
+  <div id="toastContainer"></div>
 
   <script>
 
@@ -739,6 +798,49 @@
       }
       localStorage.setItem(THEME_STORAGE_KEY, theme);
       updateThemeButtonLabel(theme);
+    }
+
+    // === TOASTS & BEEP ===
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = 880;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.2);
+      } catch (e) {}
+    }
+    function showToast(type, message, withSound = false) {
+      const container = document.getElementById("toastContainer");
+      if (!container) return;
+      const div = document.createElement("div");
+      div.classList.add("toast");
+      if (type === "success") div.classList.add("toast-success");
+      else if (type === "info") div.classList.add("toast-info");
+      else if (type === "warn") div.classList.add("toast-warn");
+      else if (type === "error") div.classList.add("toast-error");
+      else div.classList.add("toast-info");
+      div.innerHTML = `
+        <span>${message}</span>
+        <button aria-label="Cerrar">&times;</button>
+      `;
+      const closeBtn = div.querySelector("button");
+      closeBtn.addEventListener("click", () => closeToast(div));
+      container.appendChild(div);
+      if (withSound) playBeep();
+      setTimeout(() => closeToast(div), 3500);
+    }
+    function closeToast(el) {
+      el.style.animation = "toast-out 0.2s forwards";
+      setTimeout(() => {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 220);
     }
 
     // === DATA & LOCALSTORAGE ===
@@ -834,6 +936,8 @@
     const resTotalGastosSpan = document.getElementById("resTotalGastos");
 
     const resGananciaNetaSpan = document.getElementById("resGananciaNeta");
+    const resGananciaHoySpan = document.getElementById("resGananciaHoy");
+    const resGananciaAyerSpan = document.getElementById("resGananciaAyer");
 
 
 
@@ -997,6 +1101,17 @@
 
       let gananciaNeta = 0;
 
+      let gananciaHoy = 0;
+      let gananciaAyer = 0;
+
+      const hoy = new Date();
+      const ayer = new Date();
+      ayer.setDate(hoy.getDate() - 1);
+      function esMismoDia(d1, d2) {
+        return d1.getFullYear() === d2.getFullYear() &&
+               d1.getMonth() === d2.getMonth() &&
+               d1.getDate() === d2.getDate();
+      }
 
 
       pedido.items.forEach(item => {
@@ -1011,6 +1126,15 @@
 
         gananciaNeta += item.ganancia || 0;
 
+        if (item.createdAt) {
+          const fecha = new Date(item.createdAt);
+          if (esMismoDia(fecha, hoy)) {
+            gananciaHoy += item.ganancia || 0;
+          } else if (esMismoDia(fecha, ayer)) {
+            gananciaAyer += item.ganancia || 0;
+          }
+        }
+
       });
 
 
@@ -1024,6 +1148,8 @@
       resTotalGastosSpan.textContent = money(totalGastos);
 
       resGananciaNetaSpan.textContent = money(gananciaNeta);
+      if (resGananciaHoySpan) resGananciaHoySpan.textContent = money(gananciaHoy);
+      if (resGananciaAyerSpan) resGananciaAyerSpan.textContent = money(gananciaAyer);
 
 
 
@@ -1205,7 +1331,7 @@
 
       if (!nombre) {
 
-        alert("Ponle un nombre al pedido, apa.");
+        showToast("warn", "Ponle un nombre al pedido, apa.");
 
         return;
 
@@ -1213,7 +1339,7 @@
 
       if (!tc) {
 
-        alert("Pon un tipo de cambio válido.");
+        showToast("warn", "Pon un tipo de cambio válido.");
 
         return;
 
@@ -1242,6 +1368,7 @@
       pedidoNombreInput.value = "";
 
       renderTodo();
+      showToast("success", "Nuevo pedido creado, apa ✔️", true);
 
     });
 
@@ -1273,7 +1400,7 @@
 
       if (!pedido) {
 
-        alert("No hay pedido seleccionado.");
+        showToast("warn", "No hay pedido seleccionado.");
 
         return;
 
@@ -1282,6 +1409,12 @@
       pedido.finalizado = !pedido.finalizado;
 
       renderTodo();
+      showToast(
+        "info",
+        pedido.finalizado
+          ? "Pedido marcado como finalizado ✅"
+          : "Pedido reabierto, sigue la talacha 🔄"
+      );
 
     });
 
@@ -1293,7 +1426,7 @@
 
       if (!pedido) {
 
-        alert("No hay pedido seleccionado.");
+        showToast("warn", "No hay pedido seleccionado.");
 
         return;
 
@@ -1312,6 +1445,7 @@
       pedidoActualId = pedidos.length ? pedidos[0].id : null;
 
       renderTodo();
+      showToast("error", "Pedido borrado, apa. Ya no hay vuelta atrás. 🗑️");
 
     });
 
@@ -1323,7 +1457,7 @@
 
       if (!pedido) {
 
-        alert("Primero crea o selecciona un pedido.");
+        showToast("warn", "Primero crea o selecciona un pedido.");
 
         return;
 
@@ -1351,7 +1485,7 @@
 
       if (!nombre) {
 
-        alert("Ponle nombre a la pieza.");
+        showToast("warn", "Ponle nombre a la pieza, apa.");
 
         return;
 
@@ -1359,7 +1493,7 @@
 
       if (!precioCompra) {
 
-        alert("Precio de compra inválido.");
+        showToast("warn", "Precio de compra inválido, chécalo bien.");
 
         return;
 
@@ -1377,7 +1511,7 @@
 
         if (!tipoCambio) {
 
-          alert("El pedido no tiene tipo de cambio válido.");
+          showToast("error", "El pedido no tiene tipo de cambio válido.");
 
           return;
 
@@ -1415,7 +1549,8 @@
 
         gastos: gastos || null,
 
-        ganancia: 0
+        ganancia: 0,
+        createdAt: new Date().toISOString()
 
       };
 
@@ -1446,6 +1581,7 @@
 
 
       renderTodo();
+      showToast("success", "Simón, pieza agregada al pedido. ✔️", true);
 
     });
 
