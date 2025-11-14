@@ -10,13 +10,55 @@
 
   <style>
 
+    /* Auto theme using system setting */
+    :root {
+
+      color-scheme: light dark;
+
+      /* LIGHT MODE (default) */
+      --bg-body: #f4f4f4;
+      --text-color: #111111;
+      --container-bg: #ffffff;
+      --section-bg: #f4f4f6;
+      --border-color: #dddddd;
+      --input-bg: #ffffff;
+      --table-even: #f9f9f9;
+      --table-odd: #ffffff;
+      --muted-color: #555555;
+      --button-bg: #007bff;
+      --button-bg-hover: #0056b3;
+      --button-secondary: #cccccc;
+      --button-secondary-hover: #bbbbbb;
+      --button-danger: #d9534f;
+      --button-danger-hover: #c9302c;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-body: #17181c;
+        --text-color: #f5f5f5;
+        --container-bg: #22232a;
+        --section-bg: #2a2b33;
+        --border-color: #444444;
+        --input-bg: #17181c;
+        --table-even: #272831;
+        --table-odd: #20212a;
+        --muted-color: #aaaaaa;
+        --button-bg: #007bff;
+        --button-bg-hover: #0056b3;
+        --button-secondary: #444b;
+        --button-secondary-hover: #555b;
+        --button-danger: #c82333;
+        --button-danger-hover: #a71d2a;
+      }
+    }
     body {
 
       font-family: Arial, sans-serif;
 
-      background: #17181c;
+      background: var(--bg-body);
 
-      color: #f5f5f5;
+      color: var(--text-color);
 
       margin: 0;
 
@@ -42,7 +84,7 @@
 
       margin: 0 auto;
 
-      background: #22232a;
+      background: var(--container-bg);
 
       padding: 20px;
 
@@ -60,7 +102,7 @@
 
       border-radius: 8px;
 
-      background: #2a2b33;
+      background: var(--section-bg);
 
     }
 
@@ -88,13 +130,13 @@
 
       border-radius: 5px;
 
-      border: 1px solid #444;
+      border: 1px solid var(--border-color);
 
       box-sizing: border-box;
 
-      background: #17181c;
+      background: var(--input-bg);
 
-      color: #f5f5f5;
+      color: var(--text-color);
 
       font-size: 13px;
 
@@ -124,7 +166,7 @@
 
       border-radius: 6px;
 
-      background: #007bff;
+      background: var(--button-bg);
 
       color: #fff;
 
@@ -140,31 +182,31 @@
 
     button.secondary {
 
-      background: #444b;
+      background: var(--button-secondary);
 
     }
 
     button.danger {
 
-      background: #c82333;
+      background: var(--button-danger);
 
     }
 
     button:hover {
 
-      background: #0056b3;
+      background: var(--button-bg-hover);
 
     }
 
     button.secondary:hover {
 
-      background: #555b;
+      background: var(--button-secondary-hover);
 
     }
 
     button.danger:hover {
 
-      background: #a71d2a;
+      background: var(--button-danger-hover);
 
     }
 
@@ -212,7 +254,7 @@
 
     th, td {
 
-      border: 1px solid #444;
+      border: 1px solid var(--border-color);
 
       padding: 5px;
 
@@ -236,13 +278,13 @@
 
     tbody tr:nth-child(even) {
 
-      background: #272831;
+      background: var(--table-even);
 
     }
 
     tbody tr:nth-child(odd) {
 
-      background: #20212a;
+      background: var(--table-odd);
 
     }
 
@@ -281,6 +323,8 @@
       font-size: 11px;
 
       opacity: 0.8;
+
+      color: var(--muted-color);
 
     }
 
