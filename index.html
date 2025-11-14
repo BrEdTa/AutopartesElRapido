@@ -531,8 +531,141 @@
         right: auto;
       }
     }
+
+    /* ============================
+       INVENTARIO TIPO CATÁLOGO
+       ============================ */
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .item-card {
+      background: var(--section-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+    .item-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+    }
+    .item-card-header {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .item-photo {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid var(--border-color);
+    }
+    .item-photo.placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--muted-color);
+      background: rgba(0,0,0,0.05);
+    }
+    .item-title {
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .item-sub {
+      font-size: 11px;
+      color: var(--muted-color);
+    }
+    .item-pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .pill {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+    }
+    .pill-stock {
+      background: #155724;
+      color: #d4edda;
+      border-color: #155724;
+    }
+    .pill-out {
+      background: #721c24;
+      color: #f8d7da;
+      border-color: #721c24;
+    }
+    .item-card-body {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 6px;
+      font-size: 11px;
+    }
+    .item-card-body div {
+      text-align: left;
+    }
+    .item-label {
+      font-weight: bold;
+      display: block;
+    }
+    .item-edit-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+    /* Botón peque para editar dentro de la tarjeta */
+    .item-edit-btn {
+      padding: 4px 10px;
+      font-size: 11px;
+    }
+
+    /* ============================
+       MODAL PARA EDITAR PIEZA
+       ============================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+    }
+    .modal {
+      background: var(--container-bg);
+      border-radius: 12px;
+      padding: 16px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.35);
+    }
+    .modal h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    .modal .grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
+    }
   </style>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -581,6 +714,12 @@
 
           <div class="small-note">Elige un pedido existente para ver/editar sus piezas.</div>
 
+        </div>
+
+        <div>
+          <label for="piezaFoto">Foto de la pieza</label>
+          <input id="piezaFoto" type="file" accept="image/*">
+          <div class="small-note">La foto se guarda solo en este dispositivo.</div>
         </div>
 
       </div>
@@ -680,34 +819,12 @@
       <h2>Piezas del pedido</h2>
 
       <div class="small-note">
-
-        Puedes editar directamente los campos de venta, importación y gastos en la tabla.  
-
-        La ganancia se recalcula sola y todo se guarda en el navegador (localStorage).
-
+        Este es el inventario del pedido. Haz clic en una pieza para editarla.
       </div>
 
-      <table>
-
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Moneda</th>
-            <th>Precio unitario</th>
-            <th>Cant.</th>
-            <th>Costo MXN</th>
-            <th>PV sugerido</th>
-          </tr>
-        </thead>
-
-        <tbody id="tablaPiezasBody">
-
-          <!-- rows -->
-
-        </tbody>
-
-      </table>
+      <div id="tablaPiezasBody" class="inventory-grid">
+        <!-- tarjetas se generan con JS -->
+      </div>
 
     </div>
 
@@ -836,10 +953,75 @@
 
   </div>
 
+  <!-- MODAL EDITAR PIEZA -->
+  <div id="itemModal" class="modal-overlay">
+    <div class="modal">
+      <h3>Editar pieza</h3>
+      <div class="grid">
+        <div>
+          <label for="modalNombre">Nombre</label>
+          <input id="modalNombre" type="text">
+        </div>
+        <div>
+          <label for="modalCantidad">Cantidad</label>
+          <input id="modalCantidad" type="number" min="1" step="1">
+        </div>
+        <div>
+          <label for="modalPrecioTotal">Precio total pagado</label>
+          <input id="modalPrecioTotal" type="number" step="0.01" min="0">
+        </div>
+        <div>
+          <label for="modalPvSugerido">PV sugerido (MXN)</label>
+          <input id="modalPvSugerido" type="number" step="0.01" min="0">
+        </div>
+      </div>
+      <div class="small-note">
+        La ganancia se recalcula sola en el resumen según compras, ventas y gastos. 😎
+      </div>
+      <div class="modal-actions">
+        <button id="modalCancelarBtn" class="secondary">Cancelar</button>
+        <button id="modalGuardarBtn">Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOASTS -->
   <div id="toastContainer"></div>
 
   <script>
+
+    // === SUPABASE CONFIG ===
+    const SUPABASE_URL = "https://refqxlyscesqnforopfv.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZnF4bHlzY2VzcW5mb3JvcGZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNDUwOTcsImV4cCI6MjA3ODcyMTA5N30.cUnSQrStS204lkEiDj-bFS4fvflLuUzjRKWxuJ4VI8U";
+    const STORAGE_BUCKET = "autopartes-fotos";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Sube una foto y regresa la URL pública
+    async function subirFotoPieza(file, pedidoId) {
+      if (!file) return null;
+
+      const ext = file.name.split(".").pop() || "jpg";
+      const filePath = `${pedidoId}/${uuid()}.${ext}`;
+
+      const { error } = await supabaseClient
+        .storage
+        .from(STORAGE_BUCKET)
+        .upload(filePath, file, { upsert: true });
+
+      if (error) {
+        console.error("Error subiendo foto:", error);
+        showToast("error", "No se pudo subir la foto, apa.");
+        return null;
+      }
+
+      const { data } = supabaseClient
+        .storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(filePath);
+
+      return data?.publicUrl || null;
+    }
 
     // === THEME LIGHT/DARK ===
     const THEME_STORAGE_KEY = "apr_tema_pref"; // "auto" | "light" | "dark"
@@ -979,6 +1161,7 @@
     const piezaCantidadInput = document.getElementById("piezaCantidad");
 
     const piezaPvSugeridoInput = document.getElementById("piezaPvSugerido");
+    const piezaFotoInput = document.getElementById("piezaFoto");
 
     const agregarPiezaBtn = document.getElementById("agregarPiezaBtn");
 
@@ -1002,6 +1185,16 @@
     const agregarVentaBtn = document.getElementById("agregarVentaBtn");
     const tablaVentasBody = document.getElementById("tablaVentasBody");
 
+    // MODAL PIEZA
+    const itemModal = document.getElementById("itemModal");
+    const modalNombreInput = document.getElementById("modalNombre");
+    const modalCantidadInput = document.getElementById("modalCantidad");
+    const modalPrecioTotalInput = document.getElementById("modalPrecioTotal");
+    const modalPvSugeridoInput = document.getElementById("modalPvSugerido");
+    const modalGuardarBtn = document.getElementById("modalGuardarBtn");
+    const modalCancelarBtn = document.getElementById("modalCancelarBtn");
+
+    let itemEditId = null;
 
 
     const resTotalInversionSpan = document.getElementById("resTotalInversion");
@@ -1032,6 +1225,7 @@
 
     }
 
+    let lastFotoDataUrl = null;
 
 
     function guardarLocal() {
@@ -1271,34 +1465,107 @@
 
     function renderTablaPiezas(pedido) {
       tablaPiezasBody.innerHTML = "";
+
       if (!pedido || !pedido.items.length) {
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = 7;
-        td.textContent = "No hay piezas en este pedido.";
-        tr.appendChild(td);
-        tablaPiezasBody.appendChild(tr);
+        const empty = document.createElement("div");
+        empty.textContent = "No hay piezas en este pedido.";
+        empty.className = "small-note";
+        tablaPiezasBody.appendChild(empty);
         return;
       }
 
       pedido.items.forEach((item, idx) => {
-        const tr = document.createElement("tr");
+        const card = document.createElement("div");
+        card.className = "item-card";
+        card.dataset.itemId = item.id;
 
-        function tdText(text) {
-          const td = document.createElement("td");
-          td.textContent = text;
-          return td;
+        // HEADER: foto + título
+        const header = document.createElement("div");
+        header.className = "item-card-header";
+
+        let img;
+        if (item.foto) {
+          img = document.createElement("img");
+          img.src = item.foto;
+          img.alt = item.nombre || "Pieza";
+          img.className = "item-photo";
+        } else {
+          img = document.createElement("div");
+          img.className = "item-photo placeholder";
+          img.textContent = "Sin foto";
         }
 
-        tr.appendChild(tdText(idx + 1));
-        tr.appendChild(tdText(item.nombre || "-"));
-        tr.appendChild(tdText(item.moneda || "-"));
-        tr.appendChild(tdText(money(item.precioUnitario || 0))); // unitario ya calculado
-        tr.appendChild(tdText(item.cantidad || 1));
-        tr.appendChild(tdText(money(item.costoMx || 0)));      // total MXN
-        tr.appendChild(tdText(item.pvSugerido ? money(item.pvSugerido) : "-"));
+        const headerText = document.createElement("div");
+        const title = document.createElement("div");
+        title.className = "item-title";
+        title.textContent = item.nombre || "(Sin nombre)";
 
-        tablaPiezasBody.appendChild(tr);
+        const sub = document.createElement("div");
+        sub.className = "item-sub";
+        sub.textContent = `Moneda: ${item.moneda || "-"} · #${idx + 1}`;
+
+        const pillRow = document.createElement("div");
+        pillRow.className = "item-pill-row";
+        const pillStock = document.createElement("span");
+        pillStock.className = "pill " + ((item.cantidad || 0) > 0 ? "pill-stock" : "pill-out");
+        pillStock.textContent = (item.cantidad || 0) > 0 ? "STOCK" : "AGOTADO";
+
+        const pillCant = document.createElement("span");
+        pillCant.className = "pill";
+        pillCant.textContent = `Cant: ${item.cantidad || 0}`;
+
+        pillRow.appendChild(pillStock);
+        pillRow.appendChild(pillCant);
+
+        headerText.appendChild(title);
+        headerText.appendChild(sub);
+        headerText.appendChild(pillRow);
+
+        header.appendChild(img);
+        header.appendChild(headerText);
+
+        // BODY: datos numéricos
+        const body = document.createElement("div");
+        body.className = "item-card-body";
+
+        const costoUnitMx = (item.cantidad || 0) > 0 ? (item.costoMx || 0) / (item.cantidad || 1) : 0;
+
+        function block(label, value) {
+          const div = document.createElement("div");
+          const lbl = document.createElement("span");
+          lbl.className = "item-label";
+          lbl.textContent = label;
+          const val = document.createElement("span");
+          val.textContent = value;
+          div.appendChild(lbl);
+          div.appendChild(val);
+          return div;
+        }
+
+        body.appendChild(block("Costo total (MXN)", `$ ${money(item.costoMx || 0)}`));
+        body.appendChild(block("Costo unit. (MXN)", `$ ${money(costoUnitMx)}`));
+        body.appendChild(block("PV sugerido", item.pvSugerido ? `$ ${money(item.pvSugerido)}` : "-"));
+
+        // Footer: botón editar
+        const footer = document.createElement("div");
+        footer.className = "item-edit-row";
+        const editBtn = document.createElement("button");
+        editBtn.className = "secondary item-edit-btn";
+        editBtn.textContent = "Editar";
+        editBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openItemModal(item.id);
+        });
+        footer.appendChild(editBtn);
+
+        card.appendChild(header);
+        card.appendChild(body);
+        card.appendChild(footer);
+
+        // Click en tarjeta también abre modal
+        card.addEventListener("click", () => openItemModal(item.id));
+
+        tablaPiezasBody.appendChild(card);
       });
     }
 
@@ -1391,6 +1658,26 @@
       });
     }
 
+
+    function openItemModal(itemId) {
+      const pedido = getPedidoActual();
+      if (!pedido) return;
+      const item = pedido.items.find(i => i.id === itemId);
+      if (!item) return;
+
+      itemEditId = item.id;
+      modalNombreInput.value = item.nombre || "";
+      modalCantidadInput.value = item.cantidad || 1;
+      modalPrecioTotalInput.value = item.precioTotal || 0;
+      modalPvSugeridoInput.value = item.pvSugerido || 0;
+
+      itemModal.style.display = "flex";
+    }
+
+    function closeItemModal() {
+      itemEditId = null;
+      itemModal.style.display = "none";
+    }
 
     function renderTodo() {
 
@@ -1572,7 +1859,22 @@
 
 
 
-    agregarPiezaBtn.addEventListener("click", () => {
+    if (piezaFotoInput) {
+      piezaFotoInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) {
+          lastFotoDataUrl = null;
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          lastFotoDataUrl = ev.target && ev.target.result ? ev.target.result : null;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    agregarPiezaBtn.addEventListener("click", async () => {
 
       const pedido = getPedidoActual();
 
@@ -1648,6 +1950,12 @@
 
 
 
+      // subir foto a Supabase (opcional)
+      let fotoUrl = null;
+      if (piezaFotoInput && piezaFotoInput.files && piezaFotoInput.files[0]) {
+        fotoUrl = await subirFotoPieza(piezaFotoInput.files[0], pedido.id);
+      }
+
       const nuevaPieza = {
 
         id: uuid(),
@@ -1665,6 +1973,8 @@
         costoMx,            // total en MXN
 
         pvSugerido: pvSugerido || null,
+
+        foto: fotoUrl || null,
 
         ganancia: 0,
 
@@ -1688,6 +1998,8 @@
 
       piezaPvSugeridoInput.value = "";
 
+      if (piezaFotoInput) piezaFotoInput.value = "";
+      lastFotoDataUrl = null;
 
 
       renderTodo();
@@ -1787,6 +2099,65 @@
       renderTodo();
     });
 
+
+    modalCancelarBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      closeItemModal();
+    });
+
+    modalGuardarBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const pedido = getPedidoActual();
+      if (!pedido || !itemEditId) {
+        closeItemModal();
+        return;
+      }
+      const item = pedido.items.find(i => i.id === itemEditId);
+      if (!item) {
+        closeItemModal();
+        return;
+      }
+
+      const nuevoNombre = modalNombreInput.value.trim();
+      const nuevaCant = parseFloat(modalCantidadInput.value) || 1;
+      const nuevoPrecioTotal = parseFloat(modalPrecioTotalInput.value) || 0;
+      const nuevoPvSug = parseFloat(modalPvSugeridoInput.value) || 0;
+
+      if (!nuevoNombre) {
+        showToast("warn", "Ponle nombre a la pieza, apa.");
+        return;
+      }
+      if (!nuevoPrecioTotal) {
+        showToast("warn", "Precio total inválido.");
+        return;
+      }
+
+      item.nombre = nuevoNombre;
+      item.cantidad = nuevaCant;
+      item.precioTotal = nuevoPrecioTotal;
+      item.pvSugerido = nuevoPvSug || null;
+
+      // recalcular unitario y costoMx
+      const precioUnitario = nuevaCant > 0 ? (nuevoPrecioTotal / nuevaCant) : 0;
+      item.precioUnitario = precioUnitario;
+      const tipoCambio = getPedidoActual().tipoCambio || 0;
+      let costoUnitMx = precioUnitario;
+      if (item.moneda === "USD" && tipoCambio) {
+        costoUnitMx = precioUnitario * tipoCambio;
+      }
+      item.costoMx = costoUnitMx * nuevaCant;
+
+      closeItemModal();
+      renderTodo();
+      showToast("success", "Pieza actualizada ✔️", true);
+    });
+
+    // cerrar modal si clic fuera
+    itemModal.addEventListener("click", (e) => {
+      if (e.target === itemModal) {
+        closeItemModal();
+      }
+    });
 
 
     function onEditarCampoPieza(e) {
