@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Control de Inventario - Autopartes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="file"] {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    input[type="number"] {
+      text-align: right;
+    }
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 5px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: center;
+      font-size: 13px;
+    }
+    th {
+      background: #007bff;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tbody tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    img {
+      max-width: 60px;
+      max-height: 60px;
+      border-radius: 4px;
+      object-fit: cover;
+    }
+    .resumen {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f0f8ff;
+      border: 1px solid #cfe2ff;
+    }
+    .resumen h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+    .resumen ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    .resumen li {
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+    .botones-secundarios {
+      margin-top: 10px;
+    }
+    /* Overlay de login */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(11,12,15,0.8);
+      backdrop-filter: blur(3px);
+      z-index: 9999;
+    }
+    .login-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      text-align: center;
+      max-width: 420px;
+      width: calc(100% - 40px);
+    }
+  </style>
+</head>
+<body>
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+      <h2 style="margin-top:0;margin-bottom:12px;">Autopartes El Rápido</h2>
+      <p style="margin-top:0;margin-bottom:16px;">Inicia sesión con GitHub para continuar</p>
+      <button id="loginBtn">Ingresar con GitHub</button>
+    </div>
+  </div>
+
+  <div id="appContainer" class="container" hidden>
+    <div id="userBar" style="display:flex;justify-content:flex-end;gap:8px;align-items:center;">
+      <img id="userAvatar" width="28" height="28" style="border-radius:50%;display:none;">
+      <span id="userName" style="font-size:13px;color:#555;display:none;"></span>
+      <button id="logoutBtn" style="background:#6c757d;display:none;">Cerrar sesión</button>
+    </div>
+    <h1>Inventario / Contabilidad - Autopartes</h1>
+    <p>Ingresa los datos de cada pieza para calcular la ganancia neta por venta.</p>
+
+    <div class="form-grid">
+      <div>
+        <label for="nombre">Nombre de la pieza</label>
+        <input type="text" id="nombre" placeholder="Ej. Sensor de cigüeñal 300C">
+      </div>
+
+      <div>
+        <label for="foto">Foto de la pieza (opcional)</label>
+        <input type="file" id="foto" accept="image/*">
+      </div>
+
+      <div>
+        <label for="precioUsd">Precio de la pieza (USD)</label>
+        <input type="number" id="precioUsd" step="0.01" min="0" placeholder="Ej. 45">
+      </div>
+
+      <div>
+        <label for="tipoCambio">Tipo de cambio (MXN por 1 USD)</label>
+        <input type="number" id="tipoCambio" step="0.01" min="0" value="19.50">
+      </div>
+
+      <div>
+        <label for="precioVenta">Precio de venta (MXN)</label>
+        <input type="number" id="precioVenta" step="0.01" min="0" placeholder="Ej. 1600">
+      </div>
+
+      <div>
+        <label for="gastoImportacion">Gastos de importación (MXN)</label>
+        <input type="number" id="gastoImportacion" step="0.01" min="0" placeholder="Si no hubo, deja en 0">
+      </div>
+
+      <div>
+        <label for="gastoPersonal">Gastos personales (MXN)</label>
+        <input type="number" id="gastoPersonal" step="0.01" min="0" placeholder="Gasolina, caseta, etc.">
+      </div>
+    </div>
+
+    <button id="agregarBtn">Agregar al registro</button>
+
+    <div class="botones-secundarios">
+      <button id="guardarTodoBtn">Guardar manualmente</button>
+      <button id="borrarTodoBtn">Borrar todo (local)</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Foto</th>
+          <th>Nombre</th>
+          <th>Precio USD</th>
+          <th>Tipo cambio</th>
+          <th>Costo en MXN</th>
+          <th>Venta MXN</th>
+          <th>Imp. MXN</th>
+          <th>Pers. MXN</th>
+          <th>Ganancia neta MXN</th>
+        </tr>
+      </thead>
+      <tbody id="tablaBody">
+        <!-- Filas se agregan aquí -->
+      </tbody>
+    </table>
+
+    <div class="resumen">
+      <h2>Resumen general</h2>
+      <ul>
+        <li><strong>Total invertido en producto (MXN):</strong> <span id="totalCosto">0.00</span></li>
+        <li><strong>Total gastos de importación (MXN):</strong> <span id="totalImp">0.00</span></li>
+        <li><strong>Total gastos personales (MXN):</strong> <span id="totalPers">0.00</span></li>
+        <li><strong>Total ventas (MXN):</strong> <span id="totalVentas">0.00</span></li>
+        <li><strong>Ganancia neta total (MXN):</strong> <span id="totalGanancia">0.00</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getAuth, GithubAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+    // Reemplaza con tu configuración de Firebase (proyecto propio)
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_PROJECT_ID.firebaseapp.com",
+      projectId: "TU_PROJECT_ID",
+      appId: "TU_APP_ID"
+    };
+
+    let app = null;
+    let auth = null;
+    try {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+    } catch (e) {
+      console.warn("Firebase no configurado. El login no funcionará hasta configurar credenciales.", e);
+    }
+
+    const appContainer = document.getElementById("appContainer");
+    const overlay = document.getElementById("loginOverlay");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userName = document.getElementById("userName");
+    const userAvatar = document.getElementById("userAvatar");
+
+    function showApp() {
+      if (appContainer) appContainer.removeAttribute("hidden");
+      if (overlay) overlay.style.display = "none";
+      if (logoutBtn) logoutBtn.style.display = "inline-block";
+      if (userName) userName.style.display = "inline";
+      if (userAvatar) userAvatar.style.display = "inline";
+    }
+
+    function hideApp() {
+      if (appContainer) appContainer.setAttribute("hidden", "true");
+      if (overlay) overlay.style.display = "grid";
+      if (logoutBtn) logoutBtn.style.display = "none";
+      if (userName) userName.style.display = "none";
+      if (userAvatar) userAvatar.style.display = "none";
+    }
+
+    if (loginBtn) {
+      loginBtn.addEventListener("click", async () => {
+        if (!auth) {
+          alert("Configura Firebase y el proveedor de GitHub para iniciar sesión.");
+          return;
+        }
+        try {
+          await signInWithPopup(auth, new GithubAuthProvider());
+        } catch (err) {
+          alert("No se pudo iniciar sesión con GitHub.");
+          console.error(err);
+        }
+      });
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        if (!auth) return;
+        await signOut(auth);
+      });
+    }
+
+    if (auth) {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          if (userName) userName.textContent = user.displayName || user.email || "Usuario";
+          if (userAvatar && user.photoURL) userAvatar.src = user.photoURL;
+          showApp();
+        } else {
+          hideApp();
+        }
+      });
+    } else {
+      hideApp();
+    }
+  </script>
+
+  <script>
+    // Clave para localStorage
+    const STORAGE_KEY_ITEMS = "inventarioAutopartesItems";
+    const STORAGE_KEY_TIPO_CAMBIO = "inventarioAutopartesTipoCambio";
+
+    // Arreglo global de items
+    let items = [];
+
+    const tablaBody = document.getElementById("tablaBody");
+    const agregarBtn = document.getElementById("agregarBtn");
+    const guardarTodoBtn = document.getElementById("guardarTodoBtn");
+    const borrarTodoBtn = document.getElementById("borrarTodoBtn");
+
+    const totalCostoSpan = document.getElementById("totalCosto");
+    const totalImpSpan = document.getElementById("totalImp");
+    const totalPersSpan = document.getElementById("totalPers");
+    const totalVentasSpan = document.getElementById("totalVentas");
+    const totalGananciaSpan = document.getElementById("totalGanancia");
+
+    const tipoCambioInput = document.getElementById("tipoCambio");
+
+    function formatMoney(value) {
+      return value.toFixed(2);
+    }
+
+    function actualizarResumen() {
+      let totalCosto = 0;
+      let totalImp = 0;
+      let totalPers = 0;
+      let totalVentas = 0;
+      let totalGanancia = 0;
+
+      items.forEach(item => {
+        totalCosto += item.costoMx;
+        totalImp += item.gastoImportacion;
+        totalPers += item.gastoPersonal;
+        totalVentas += item.precioVenta;
+        totalGanancia += item.ganancia;
+      });
+
+      totalCostoSpan.textContent = formatMoney(totalCosto);
+      totalImpSpan.textContent = formatMoney(totalImp);
+      totalPersSpan.textContent = formatMoney(totalPers);
+      totalVentasSpan.textContent = formatMoney(totalVentas);
+      totalGananciaSpan.textContent = formatMoney(totalGanancia);
+    }
+
+    function agregarFilaTabla(item, index) {
+      const tr = document.createElement("tr");
+
+      const tdIndex = document.createElement("td");
+      tdIndex.textContent = index + 1;
+
+      const tdFoto = document.createElement("td");
+      if (item.fotoDataUrl) {
+        const img = document.createElement("img");
+        img.src = item.fotoDataUrl;
+        tdFoto.appendChild(img);
+      } else {
+        tdFoto.textContent = "-";
+      }
+
+      const tdNombre = document.createElement("td");
+      tdNombre.textContent = item.nombre || "-";
+
+      const tdPrecioUsd = document.createElement("td");
+      tdPrecioUsd.textContent = formatMoney(item.precioUsd);
+
+      const tdTipoCambio = document.createElement("td");
+      tdTipoCambio.textContent = formatMoney(item.tipoCambio);
+
+      const tdCostoMx = document.createElement("td");
+      tdCostoMx.textContent = formatMoney(item.costoMx);
+
+      const tdVenta = document.createElement("td");
+      tdVenta.textContent = formatMoney(item.precioVenta);
+
+      const tdImp = document.createElement("td");
+      tdImp.textContent = formatMoney(item.gastoImportacion);
+
+      const tdPers = document.createElement("td");
+      tdPers.textContent = formatMoney(item.gastoPersonal);
+
+      const tdGanancia = document.createElement("td");
+      tdGanancia.textContent = formatMoney(item.ganancia);
+
+      tr.appendChild(tdIndex);
+      tr.appendChild(tdFoto);
+      tr.appendChild(tdNombre);
+      tr.appendChild(tdPrecioUsd);
+      tr.appendChild(tdTipoCambio);
+      tr.appendChild(tdCostoMx);
+      tr.appendChild(tdVenta);
+      tr.appendChild(tdImp);
+      tr.appendChild(tdPers);
+      tr.appendChild(tdGanancia);
+
+      tablaBody.appendChild(tr);
+    }
+
+    function repintarTabla() {
+      tablaBody.innerHTML = "";
+      items.forEach((it, idx) => agregarFilaTabla(it, idx));
+    }
+
+    // ----- LOCALSTORAGE -----
+    function guardarEnLocalStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(items));
+        localStorage.setItem(STORAGE_KEY_TIPO_CAMBIO, tipoCambioInput.value || "");
+      } catch (e) {
+        console.error("Error guardando en localStorage:", e);
+      }
+    }
+
+    function cargarDesdeLocalStorage() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEY_ITEMS);
+        if (data) {
+          const parsed = JSON.parse(data);
+          if (Array.isArray(parsed)) {
+            items = parsed;
+          }
+        }
+
+        const savedTipoCambio = localStorage.getItem(STORAGE_KEY_TIPO_CAMBIO);
+        if (savedTipoCambio) {
+          tipoCambioInput.value = savedTipoCambio;
+        }
+      } catch (e) {
+        console.error("Error cargando desde localStorage:", e);
+      }
+
+      repintarTabla();
+      actualizarResumen();
+    }
+
+    function procesarRegistro(fotoDataUrl) {
+      const nombre = document.getElementById("nombre").value.trim();
+      const precioUsd = parseFloat(document.getElementById("precioUsd").value) || 0;
+      const tipoCambio = parseFloat(tipoCambioInput.value) || 0;
+      const precioVenta = parseFloat(document.getElementById("precioVenta").value) || 0;
+      const gastoImportacion = parseFloat(document.getElementById("gastoImportacion").value) || 0;
+      const gastoPersonal = parseFloat(document.getElementById("gastoPersonal").value) || 0;
+
+      if (!precioUsd || !tipoCambio || !precioVenta) {
+        alert("Por favor llena al menos: Precio USD, Tipo de cambio y Precio de venta.");
+        return;
+      }
+
+      const costoMx = precioUsd * tipoCambio;
+      const ganancia = precioVenta - costoMx - gastoImportacion - gastoPersonal;
+
+      const item = {
+        nombre,
+        fotoDataUrl: fotoDataUrl || null,
+        precioUsd,
+        tipoCambio,
+        costoMx,
+        precioVenta,
+        gastoImportacion,
+        gastoPersonal,
+        ganancia
+      };
+
+      items.push(item);
+
+      repintarTabla();
+      actualizarResumen();
+      guardarEnLocalStorage(); // guardamos cada vez que agregas
+
+      // Limpiar inputs (menos tipo de cambio)
+      document.getElementById("nombre").value = "";
+      document.getElementById("precioUsd").value = "";
+      document.getElementById("precioVenta").value = "";
+      document.getElementById("gastoImportacion").value = "";
+      document.getElementById("gastoPersonal").value = "";
+      document.getElementById("foto").value = "";
+    }
+
+    agregarBtn.addEventListener("click", () => {
+      const fotoInput = document.getElementById("foto");
+      const file = fotoInput.files[0];
+
+      // También guardamos cualquier cambio al tipo de cambio
+      guardarEnLocalStorage();
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const dataUrl = e.target.result;
+          procesarRegistro(dataUrl);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        procesarRegistro(null);
+      }
+    });
+
+    guardarTodoBtn.addEventListener("click", () => {
+      guardarEnLocalStorage();
+      alert("Datos guardados en este navegador.");
+    });
+
+    borrarTodoBtn.addEventListener("click", () => {
+      const confirmar = confirm("¿Seguro que quieres borrar todo el registro guardado en este navegador?");
+      if (!confirmar) return;
+
+      items = [];
+      repintarTabla();
+      actualizarResumen();
+      localStorage.removeItem(STORAGE_KEY_ITEMS);
+      // Puedes decidir si también borrar el tipo de cambio:
+      // localStorage.removeItem(STORAGE_KEY_TIPO_CAMBIO);
+    });
+
+    // Cargar al iniciar
+    document.addEventListener("DOMContentLoaded", cargarDesdeLocalStorage);
+  </script>
+</body>
+</html>
+
+
