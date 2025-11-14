@@ -109,42 +109,11 @@
     .botones-secundarios {
       margin-top: 10px;
     }
-    /* Login overlay */
-    .login-overlay {
-      position: fixed;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      background: rgba(11,12,15,0.8);
-      backdrop-filter: blur(3px);
-      z-index: 9999;
-    }
-    .login-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      text-align: center;
-      max-width: 420px;
-      width: calc(100% - 40px);
-    }
+
   </style>
 </head>
 <body>
-  <div id="loginOverlay" class="login-overlay">
-    <div class="login-card">
-      <h2 style="margin-top:0;margin-bottom:12px;">Autopartes El Rápido</h2>
-      <p style="margin-top:0;margin-bottom:16px;">Inicia sesión con GitHub para continuar</p>
-      <button id="loginBtn">Ingresar con GitHub</button>
-    </div>
-  </div>
-
-  <div id="appContainer" class="container" hidden>
-    <div id="userBar" style="display:flex;justify-content:flex-end;gap:8px;align-items:center;">
-      <img id="userAvatar" width="28" height="28" style="border-radius:50%;display:none;">
-      <span id="userName" style="font-size:13px;color:#555;display:none;"></span>
-      <button id="logoutBtn" style="background:#6c757d;display:none;">Cerrar sesión</button>
-    </div>
+  <div class="container">
     <h1>Inventario / Contabilidad - Autopartes</h1>
     <p>Ingresa los datos de cada pieza para calcular la ganancia neta por venta.</p>
 
@@ -208,7 +177,7 @@
         </tr>
       </thead>
       <tbody id="tablaBody">
-        <!-- Filas se agregan aquí -->
+        <!-- Rows are appended here -->
       </tbody>
     </table>
 
@@ -224,93 +193,12 @@
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, GithubAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-
-    // Replace with your Firebase config (your own project)
-    const firebaseConfig = {
-      apiKey: "TU_API_KEY",
-      authDomain: "TU_PROJECT_ID.firebaseapp.com",
-      projectId: "TU_PROJECT_ID",
-      appId: "TU_APP_ID"
-    };
-
-    let app = null;
-    let auth = null;
-    try {
-      app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-    } catch (e) {
-      console.warn("Firebase no configurado. El login no funcionará hasta configurar credenciales.", e);
-    }
-
-    const appContainer = document.getElementById("appContainer");
-    const overlay = document.getElementById("loginOverlay");
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const userName = document.getElementById("userName");
-    const userAvatar = document.getElementById("userAvatar");
-
-    function showApp() {
-      if (appContainer) appContainer.removeAttribute("hidden");
-      if (overlay) overlay.style.display = "none";
-      if (logoutBtn) logoutBtn.style.display = "inline-block";
-      if (userName) userName.style.display = "inline";
-      if (userAvatar) userAvatar.style.display = "inline";
-    }
-
-    function hideApp() {
-      if (appContainer) appContainer.setAttribute("hidden", "true");
-      if (overlay) overlay.style.display = "grid";
-      if (logoutBtn) logoutBtn.style.display = "none";
-      if (userName) userName.style.display = "none";
-      if (userAvatar) userAvatar.style.display = "none";
-    }
-
-    if (loginBtn) {
-      loginBtn.addEventListener("click", async () => {
-        if (!auth) {
-          alert("Configura Firebase y el proveedor de GitHub para iniciar sesión.");
-          return;
-        }
-        try {
-          await signInWithPopup(auth, new GithubAuthProvider());
-        } catch (err) {
-          alert("No se pudo iniciar sesión con GitHub.");
-          console.error(err);
-        }
-      });
-    }
-
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", async () => {
-        if (!auth) return;
-        await signOut(auth);
-      });
-    }
-
-    if (auth) {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          if (userName) userName.textContent = user.displayName || user.email || "Usuario";
-          if (userAvatar && user.photoURL) userAvatar.src = user.photoURL;
-          showApp();
-        } else {
-          hideApp();
-        }
-      });
-    } else {
-      hideApp();
-    }
-  </script>
-
   <script>
-    // Clave para localStorage
+    // Key for localStorage
     const STORAGE_KEY_ITEMS = "inventarioAutopartesItems";
     const STORAGE_KEY_TIPO_CAMBIO = "inventarioAutopartesTipoCambio";
 
-    // Arreglo global de items
+    // Global array of items
     let items = [];
 
     const tablaBody = document.getElementById("tablaBody");
@@ -474,9 +362,9 @@
 
       repintarTabla();
       actualizarResumen();
-      guardarEnLocalStorage(); // guardamos cada vez que agregas
+      guardarEnLocalStorage(); // save each time you add
 
-      // Limpiar inputs (menos tipo de cambio)
+      // Clear inputs (except exchange rate)
       document.getElementById("nombre").value = "";
       document.getElementById("precioUsd").value = "";
       document.getElementById("precioVenta").value = "";
@@ -489,7 +377,7 @@
       const fotoInput = document.getElementById("foto");
       const file = fotoInput.files[0];
 
-      // También guardamos cualquier cambio al tipo de cambio
+      // Also persist any exchange rate change
       guardarEnLocalStorage();
 
       if (file) {
@@ -517,11 +405,11 @@
       repintarTabla();
       actualizarResumen();
       localStorage.removeItem(STORAGE_KEY_ITEMS);
-      // Puedes decidir si también borrar el tipo de cambio:
+      // You can choose to also delete the exchange rate:
       // localStorage.removeItem(STORAGE_KEY_TIPO_CAMBIO);
     });
 
-    // Cargar al iniciar
+    // Load on startup
     document.addEventListener("DOMContentLoaded", cargarDesdeLocalStorage);
   </script>
 </body>
