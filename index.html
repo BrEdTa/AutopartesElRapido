@@ -52,6 +52,43 @@
         --button-danger-hover: #a71d2a;
       }
     }
+
+    /* Force manual theme (overrides automatic) */
+    :root[data-theme="light"] {
+      --bg-body: #f4f4f4;
+      --text-color: #111111;
+      --container-bg: #ffffff;
+      --section-bg: #f4f4f6;
+      --border-color: #dddddd;
+      --input-bg: #ffffff;
+      --table-even: #f9f9f9;
+      --table-odd: #ffffff;
+      --muted-color: #555555;
+      --button-bg: #007bff;
+      --button-bg-hover: #0056b3;
+      --button-secondary: #cccccc;
+      --button-secondary-hover: #bbbbbb;
+      --button-danger: #d9534f;
+      --button-danger-hover: #c9302c;
+    }
+
+    :root[data-theme="dark"] {
+      --bg-body: #17181c;
+      --text-color: #f5f5f5;
+      --container-bg: #22232a;
+      --section-bg: #2a2b33;
+      --border-color: #444444;
+      --input-bg: #17181c;
+      --table-even: #272831;
+      --table-odd: #20212a;
+      --muted-color: #aaaaaa;
+      --button-bg: #007bff;
+      --button-bg-hover: #0056b3;
+      --button-secondary: #444b;
+      --button-secondary-hover: #555b;
+      --button-danger: #c82333;
+      --button-danger-hover: #a71d2a;
+    }
     body {
 
       font-family: Arial, sans-serif;
@@ -435,6 +472,10 @@
   <div class="container">
 
     <h1>Autopartes El Rápido - Control por pedidos</h1>
+    <button id="toggleThemeBtn" class="secondary" style="float:right; margin-top:-35px;">
+      Tema: automático
+    </button>
+    <div style="clear:both;"></div>
 
 
 
@@ -528,11 +569,19 @@
 
         <div>
 
-          <label for="piezaPrecioCompra">Precio de compra</label>
+          <label for="piezaPrecioCompra">Precio de compra (por pieza)</label>
 
           <input id="piezaPrecioCompra" type="number" step="0.01" min="0" placeholder="Ej. 45">
 
           <div class="small-note">Si está en USD se convierte con el tipo de cambio del pedido.</div>
+
+        </div>
+
+        <div>
+
+          <label for="piezaCantidad">Cantidad de piezas</label>
+
+          <input id="piezaCantidad" type="number" step="1" min="1" value="1">
 
         </div>
 
@@ -608,6 +657,8 @@
 
             <th>Precio compra</th>
 
+            <th>Cant.</th>
+
             <th>Costo MXN</th>
 
             <th>PV sugerido</th>
@@ -664,6 +715,32 @@
 
   <script>
 
+    // === THEME LIGHT/DARK ===
+    const THEME_STORAGE_KEY = "apr_tema_pref"; // "auto" | "light" | "dark"
+
+    function updateThemeButtonLabel(theme) {
+      const btn = document.getElementById("toggleThemeBtn");
+      if (!btn) return;
+      if (theme === "light") btn.textContent = "Tema: claro";
+      else if (theme === "dark") btn.textContent = "Tema: oscuro";
+      else btn.textContent = "Tema: automático";
+    }
+
+    function applyTheme(theme) {
+      const root = document.documentElement;
+      if (theme === "light") {
+        root.setAttribute("data-theme", "light");
+      } else if (theme === "dark") {
+        root.setAttribute("data-theme", "dark");
+      } else {
+        // automatic: use system preference
+        root.removeAttribute("data-theme");
+        theme = "auto";
+      }
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+      updateThemeButtonLabel(theme);
+    }
+
     // === DATA & LOCALSTORAGE ===
 
     const STORAGE_KEY_PEDIDOS = "apr_pedidos_v1";
@@ -713,6 +790,7 @@
     const pedidoTipoCambioInput = document.getElementById("pedidoTipoCambio");
 
     const pedidoSelect = document.getElementById("pedidoSelect");
+    const toggleThemeBtn = document.getElementById("toggleThemeBtn");
 
     const crearPedidoBtn = document.getElementById("crearPedidoBtn");
 
@@ -729,6 +807,7 @@
     const piezaMonedaSelect = document.getElementById("piezaMoneda");
 
     const piezaPrecioCompraInput = document.getElementById("piezaPrecioCompra");
+    const piezaCantidadInput = document.getElementById("piezaCantidad");
 
     const piezaPvSugeridoInput = document.getElementById("piezaPvSugerido");
 
@@ -974,7 +1053,7 @@
 
         const td = document.createElement("td");
 
-        td.colSpan = 10;
+        td.colSpan = 11;
 
         td.textContent = "No hay piezas en este pedido.";
 
@@ -1012,9 +1091,11 @@
 
         tr.appendChild(tdText(item.moneda));
 
-        tr.appendChild(tdText(money(item.precioCompra)));
+        tr.appendChild(tdText(money(item.precioCompra))); // per piece
 
-        tr.appendChild(tdText(money(item.costoMx)));
+        tr.appendChild(tdText(item.cantidad || 1));        // quantity
+
+        tr.appendChild(tdText(money(item.costoMx)));       // total MXN
 
 
 
@@ -1103,6 +1184,16 @@
 
 
     // === EVENTS ===
+    if (toggleThemeBtn) {
+      toggleThemeBtn.addEventListener("click", () => {
+        const current = localStorage.getItem(THEME_STORAGE_KEY) || "auto";
+        let next;
+        if (current === "auto") next = "dark";
+        else if (current === "dark") next = "light";
+        else next = "auto";
+        applyTheme(next);
+      });
+    }
 
     crearPedidoBtn.addEventListener("click", () => {
 
@@ -1244,11 +1335,13 @@
 
       const moneda = piezaMonedaSelect.value;
 
-      const precioCompra = parseFloat(piezaPrecioCompraInput.value) || 0;
+      const precioCompra = parseFloat(piezaPrecioCompraInput.value) || 0; // per piece
+
+      const cantidad = parseFloat(piezaCantidadInput.value) || 1;
 
       const pvSugerido = parseFloat(piezaPvSugeridoInput.value) || 0;
 
-      const pvFinal = parseFloat(piezaPvFinalInput.value) || 0;
+      const pvFinal = parseFloat(piezaPvFinalInput.value) || 0; // total line
 
       const importacion = parseFloat(piezaImportacionInput.value) || 0;
 
@@ -1276,7 +1369,9 @@
 
       const tipoCambio = pedido.tipoCambio || 0;
 
-      let costoMx = precioCompra;
+      // unit cost in MXN
+
+      let costoUnitMx = precioCompra;
 
       if (moneda === "USD") {
 
@@ -1288,9 +1383,13 @@
 
         }
 
-        costoMx = precioCompra * tipoCambio;
+        costoUnitMx = precioCompra * tipoCambio;
 
       }
+
+      // total line cost
+
+      const costoMx = costoUnitMx * cantidad;
 
 
 
@@ -1302,9 +1401,11 @@
 
         moneda,
 
-        precioCompra,
+        precioCompra,  // per piece
 
-        costoMx,
+        cantidad,
+
+        costoMx,       // total
 
         pvSugerido: pvSugerido || null,
 
@@ -1331,6 +1432,8 @@
       piezaNombreInput.value = "";
 
       piezaPrecioCompraInput.value = "";
+
+      piezaCantidadInput.value = "1";
 
       piezaPvSugeridoInput.value = "";
 
@@ -1393,6 +1496,9 @@
       cargarLocal();
 
       renderTodo();
+
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || "auto";
+      applyTheme(savedTheme);
 
     });
 
