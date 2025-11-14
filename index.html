@@ -328,6 +328,104 @@
 
     }
 
+
+    /* ============================
+       RESPONSIVE DESIGN
+       ============================ */
+
+    /* More compact container on small screens */
+    @media (max-width: 900px) {
+
+      .container {
+
+        padding: 15px;
+
+      }
+
+      h1, h2 {
+
+        font-size: 20px;
+
+      }
+
+    }
+
+    /* Stack grids vertically */
+    @media (max-width: 700px) {
+
+      .grid {
+
+        grid-template-columns: 1fr;
+
+      }
+
+    }
+
+    /* Scrollable table on mobile */
+    @media (max-width: 750px) {
+
+      table {
+
+        display: block;
+
+        overflow-x: auto;
+
+        white-space: nowrap;
+
+        border-radius: 8px;
+
+      }
+
+      th, td {
+
+        min-width: 120px;
+
+        font-size: 12px;
+
+        padding: 6px 8px;
+
+      }
+
+    }
+
+    /* Larger touch targets on mobile */
+    @media (max-width: 600px) {
+
+      input, select, button {
+
+        font-size: 14px;
+
+        padding: 10px;
+
+      }
+
+      button {
+
+        width: 100%;
+
+        margin-bottom: 6px;
+
+      }
+
+    }
+
+    /* Better spacing on very small screens */
+    @media (max-width: 430px) {
+
+      h1 {
+
+        font-size: 18px;
+
+      }
+
+      .section {
+
+        padding: 12px;
+
+      }
+
+    }
+
   </style>
 
 </head>
