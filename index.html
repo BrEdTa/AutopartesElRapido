@@ -985,6 +985,12 @@
     </div>
   </div>
 
+  <!-- SONIDOS PERSONALIZADOS -->
+  <audio id="sound-success" src="sounds/Ganancias.m4a" preload="auto"></audio>
+  <audio id="sound-info"   src="sounds/Ganancias.m4a" preload="auto"></audio>
+  <audio id="sound-error"  src="sounds/Error.m4a" preload="auto"></audio>
+  <audio id="sound-warn"   src="sounds/Error.m4a" preload="auto"></audio>
+
   <!-- TOASTS -->
   <div id="toastContainer"></div>
 
@@ -1065,6 +1071,28 @@
         osc.stop(ctx.currentTime + 0.2);
       } catch (e) {}
     }
+    function playSoundForToast(type) {
+      let audioId = null;
+      if (type === "success") audioId = "sound-success";
+      else if (type === "info") audioId = "sound-info";
+      else if (type === "warn") audioId = "sound-warn";
+      else if (type === "error") audioId = "sound-error";
+      else audioId = "sound-info";
+
+      const el = document.getElementById(audioId);
+      if (el) {
+        try {
+          el.currentTime = 0;
+          el.play().catch(() => {
+            // autoplay bloqueado, ignorar
+          });
+        } catch (e) {
+          playBeep();
+        }
+      } else {
+        playBeep();
+      }
+    }
     function showToast(type, message, withSound = false) {
       const container = document.getElementById("toastContainer");
       if (!container) return;
@@ -1082,7 +1110,7 @@
       const closeBtn = div.querySelector("button");
       closeBtn.addEventListener("click", () => closeToast(div));
       container.appendChild(div);
-      if (withSound) playBeep();
+      if (withSound) playSoundForToast(type);
       setTimeout(() => closeToast(div), 3500);
     }
     function closeToast(el) {
