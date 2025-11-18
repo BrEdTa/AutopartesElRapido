@@ -1,2248 +1,415 @@
 <!DOCTYPE html>
-
 <html lang="es">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <title>Autopartes El Rápido - Pedidos</title>
-
+  <title>Control de Inventario - Autopartes</title>
   <style>
-
-    /* Auto theme using system setting */
-    :root {
-
-      color-scheme: light dark;
-
-      /* LIGHT MODE (default) */
-      --bg-body: #f4f4f4;
-      --text-color: #111111;
-      --container-bg: #ffffff;
-      --section-bg: #f4f4f6;
-      --border-color: #dddddd;
-      --input-bg: #ffffff;
-      --table-even: #f9f9f9;
-      --table-odd: #ffffff;
-      --muted-color: #555555;
-      --button-bg: #007bff;
-      --button-bg-hover: #0056b3;
-      --button-secondary: #cccccc;
-      --button-secondary-hover: #bbbbbb;
-      --button-danger: #d9534f;
-      --button-danger-hover: #c9302c;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-body: #17181c;
-        --text-color: #f5f5f5;
-        --container-bg: #22232a;
-        --section-bg: #2a2b33;
-        --border-color: #444444;
-        --input-bg: #17181c;
-        --table-even: #272831;
-        --table-odd: #20212a;
-        --muted-color: #aaaaaa;
-        --button-bg: #007bff;
-        --button-bg-hover: #0056b3;
-        --button-secondary: #444b;
-        --button-secondary-hover: #555b;
-        --button-danger: #c82333;
-        --button-danger-hover: #a71d2a;
-      }
-    }
-
-    /* Force manual theme (overrides automatic) */
-    :root[data-theme="light"] {
-      --bg-body: #f4f4f4;
-      --text-color: #111111;
-      --container-bg: #ffffff;
-      --section-bg: #f4f4f6;
-      --border-color: #dddddd;
-      --input-bg: #ffffff;
-      --table-even: #f9f9f9;
-      --table-odd: #ffffff;
-      --muted-color: #555555;
-      --button-bg: #007bff;
-      --button-bg-hover: #0056b3;
-      --button-secondary: #cccccc;
-      --button-secondary-hover: #bbbbbb;
-      --button-danger: #d9534f;
-      --button-danger-hover: #c9302c;
-    }
-
-    :root[data-theme="dark"] {
-      --bg-body: #17181c;
-      --text-color: #f5f5f5;
-      --container-bg: #22232a;
-      --section-bg: #2a2b33;
-      --border-color: #444444;
-      --input-bg: #17181c;
-      --table-even: #272831;
-      --table-odd: #20212a;
-      --muted-color: #aaaaaa;
-      --button-bg: #007bff;
-      --button-bg-hover: #0056b3;
-      --button-secondary: #444b;
-      --button-secondary-hover: #555b;
-      --button-danger: #c82333;
-      --button-danger-hover: #a71d2a;
-    }
     body {
-
       font-family: Arial, sans-serif;
-
-      background: var(--bg-body);
-
-      color: var(--text-color);
-
+      background: #f4f4f4;
       margin: 0;
-
       padding: 20px;
-
     }
-
-    h1, h2, h3 {
-
-      margin: 0 0 10px;
-
-    }
-
-    a {
-
-      color: #4da3ff;
-
-    }
-
-    .container {
-
-      max-width: 1200px;
-
-      margin: 0 auto;
-
-      background: var(--container-bg);
-
-      padding: 20px;
-
-      border-radius: 10px;
-
-      box-shadow: 0 0 10px rgba(0,0,0,0.6);
-
-    }
-
-    .section {
-
-      margin-bottom: 20px;
-
-      padding: 15px;
-
-      border-radius: 8px;
-
-      background: var(--section-bg);
-
-    }
-
-    label {
-
-      font-weight: bold;
-
-      display: block;
-
-      margin-bottom: 4px;
-
-      font-size: 13px;
-
-    }
-
-    input[type="text"],
-
-    input[type="number"],
-
-    select {
-
-      width: 100%;
-
-      padding: 6px 8px;
-
-      border-radius: 5px;
-
-      border: 1px solid var(--border-color);
-
-      box-sizing: border-box;
-
-      background: var(--input-bg);
-
-      color: var(--text-color);
-
-      font-size: 13px;
-
-    }
-
-    input[type="number"] {
-
-      text-align: right;
-
-    }
-
-    /* GRID MODERNO PARA FORMULARIOS */
-    .grid {
-
-      display: grid;
-
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-
-      gap: 16px;
-
-    }
-
-    .grid > div {
-
-      background: var(--section-bg);
-
-      padding: 12px;
-
-      border-radius: 12px;
-
-      border: 1px solid var(--border-color);
-
-    }
-
-    button {
-
-      padding: 8px 14px;
-
-      border: none;
-
-      border-radius: 6px;
-
-      background: var(--button-bg);
-
-      color: #fff;
-
-      font-size: 13px;
-
-      cursor: pointer;
-
-      margin-right: 6px;
-
-      margin-top: 6px;
-
-    }
-
-    button.secondary {
-
-      background: var(--button-secondary);
-
-    }
-
-    button.danger {
-
-      background: var(--button-danger);
-
-    }
-
-    button:hover {
-
-      background: var(--button-bg-hover);
-
-    }
-
-    button.secondary:hover {
-
-      background: var(--button-secondary-hover);
-
-    }
-
-    button.danger:hover {
-
-      background: var(--button-danger-hover);
-
-    }
-
-    .badge {
-
-      display: inline-block;
-
-      padding: 3px 8px;
-
-      border-radius: 999px;
-
-      font-size: 11px;
-
-      margin-left: 5px;
-
-    }
-
-    .badge-open {
-
-      background: #155724;
-
-      color: #d4edda;
-
-    }
-
-    .badge-closed {
-
-      background: #856404;
-
-      color: #fff3cd;
-
-    }
-
-    table {
-
-      width: 100%;
-
-      border-collapse: collapse;
-
-      margin-top: 10px;
-
-      font-size: 12px;
-
-    }
-
-    th, td {
-
-      border: 1px solid var(--border-color);
-
-      padding: 5px;
-
+    h1 {
       text-align: center;
-
-    }
-
-    th {
-
-      background: #007bff;
-
-      color: #fff;
-
-      position: sticky;
-
-      top: 0;
-
-      z-index: 1;
-
-    }
-
-    tbody tr:nth-child(even) {
-
-      background: var(--table-even);
-
-    }
-
-    tbody tr:nth-child(odd) {
-
-      background: var(--table-odd);
-
-    }
-
-    td input[type="number"],
-
-    td input[type="text"] {
-
-      width: 100%;
-
-      font-size: 11px;
-
-      padding: 3px 4px;
-
-    }
-
-    .resumen ul {
-
-      list-style: none;
-
-      padding-left: 0;
-
-      margin: 0;
-
-      font-size: 13px;
-
-    }
-
-    .resumen li {
-
-      margin-bottom: 4px;
-
-    }
-
-    .small-note {
-
-      font-size: 11px;
-
-      opacity: 0.8;
-
-      color: var(--muted-color);
-
-    }
-
-
-    /* ============================
-       RESPONSIVE DESIGN
-       ============================ */
-
-    /* More compact container on small screens */
-    @media (max-width: 900px) {
-
-      .container {
-
-        padding: 15px;
-
-      }
-
-      h1, h2 {
-
-        font-size: 20px;
-
-      }
-
-    }
-
-    /* Stack grids vertically */
-    @media (max-width: 700px) {
-
-      .grid {
-
-        grid-template-columns: 1fr;
-
-      }
-
-    }
-
-    /* Scrollable table on mobile */
-    @media (max-width: 750px) {
-
-      table {
-
-        display: block;
-
-        overflow-x: auto;
-
-        white-space: nowrap;
-
-        border-radius: 8px;
-
-      }
-
-      th, td {
-
-        min-width: 120px;
-
-        font-size: 12px;
-
-        padding: 6px 8px;
-
-      }
-
-    }
-
-    /* Larger touch targets on mobile */
-    @media (max-width: 600px) {
-
-      input, select, button {
-
-        font-size: 14px;
-
-        padding: 10px;
-
-      }
-
-      button {
-
-        width: 100%;
-
-        margin-bottom: 6px;
-
-      }
-
-    }
-
-    /* Better spacing on very small screens */
-    @media (max-width: 430px) {
-
-      h1 {
-
-        font-size: 18px;
-
-      }
-
-      .section {
-
-        padding: 12px;
-
-      }
-
-    }
-
-    /* ============================
-       TOASTS / NOTIFICACIONES
-       ============================ */
-    #toastContainer {
-      position: fixed;
-      right: 15px;
-      bottom: 15px;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .toast {
-      min-width: 220px;
-      max-width: 320px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      color: #fff;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: toast-in 0.2s forwards;
-    }
-    .toast button {
-      background: transparent;
-      border: none;
-      color: inherit;
-      font-size: 14px;
-      cursor: pointer;
-      margin-left: 8px;
-      padding: 0;
-    }
-    .toast-success { background: #28a745; }
-    .toast-info    { background: #17a2b8; }
-    .toast-warn    { background: #ffc107; color: #222; }
-    .toast-error   { background: #dc3545; }
-    @keyframes toast-in {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes toast-out {
-      from { opacity: 1; transform: translateY(0); }
-      to   { opacity: 0; transform: translateY(10px); }
-    }
-    @media (max-width: 600px) {
-      #toastContainer {
-        left: 50%;
-        transform: translateX(-50%);
-        right: auto;
-      }
-    }
-
-    /* ============================
-       INVENTARIO TIPO CATÁLOGO
-       ============================ */
-    .inventory-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-    }
-    .item-card {
-      background: var(--section-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      cursor: pointer;
-      transition: transform 0.08s ease, box-shadow 0.08s ease;
-    }
-    .item-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.25);
-    }
-    .item-card-header {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    .item-photo {
-      width: 64px;
-      height: 64px;
-      border-radius: 8px;
-      object-fit: cover;
-      border: 1px solid var(--border-color);
-    }
-    .item-photo.placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      color: var(--muted-color);
-      background: rgba(0,0,0,0.05);
-    }
-    .item-title {
-      font-weight: bold;
-      font-size: 13px;
-      margin-bottom: 4px;
-    }
-    .item-sub {
-      font-size: 11px;
-      color: var(--muted-color);
-    }
-    .item-pill-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 4px;
-    }
-    .pill {
-      font-size: 10px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--border-color);
-    }
-    .pill-stock {
-      background: #155724;
-      color: #d4edda;
-      border-color: #155724;
-    }
-    .pill-out {
-      background: #721c24;
-      color: #f8d7da;
-      border-color: #721c24;
-    }
-    .item-card-body {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 6px;
-      font-size: 11px;
-    }
-    .item-card-body div {
-      text-align: left;
-    }
-    .item-label {
-      font-weight: bold;
-      display: block;
-    }
-    .item-edit-row {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 4px;
-    }
-    /* Botón peque para editar dentro de la tarjeta */
-    .item-edit-btn {
-      padding: 4px 10px;
-      font-size: 11px;
-    }
-
-    /* ============================
-       MODAL PARA EDITAR PIEZA
-       ============================ */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9998;
-    }
-    .modal {
-      background: var(--container-bg);
-      border-radius: 12px;
-      padding: 16px;
-      max-width: 420px;
-      width: 90%;
-      box-shadow: 0 5px 12px rgba(0,0,0,0.35);
-    }
-    .modal h3 {
-      margin-top: 0;
       margin-bottom: 10px;
     }
-    .modal .grid {
-      grid-template-columns: 1fr 1fr;
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 12px;
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="file"] {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    input[type="number"] {
+      text-align: right;
+    }
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 5px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: center;
+      font-size: 13px;
+    }
+    th {
+      background: #007bff;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tbody tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    img {
+      max-width: 60px;
+      max-height: 60px;
+      border-radius: 4px;
+      object-fit: cover;
+    }
+    .resumen {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f0f8ff;
+      border: 1px solid #cfe2ff;
+    }
+    .resumen h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+    .resumen ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    .resumen li {
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+    .botones-secundarios {
+      margin-top: 10px;
     }
   </style>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
-
   <div class="container">
+    <h1>Inventario / Contabilidad - Autopartes</h1>
+    <p>Ingresa los datos de cada pieza para calcular la ganancia neta por venta.</p>
 
-    <h1>Autopartes El Rápido - Control por pedidos</h1>
-    <button id="toggleThemeBtn" class="secondary" style="float:right; margin-top:-35px;">
-      Tema: automático
-    </button>
-    <div style="clear:both;"></div>
-
-
-
-    <!-- SECTION: ORDERS -->
-
-    <div class="section">
-
-      <h2>Pedidos de eBay</h2>
-
-      <div class="grid">
-
-        <div>
-
-          <label for="pedidoNombre">Nombre del pedido</label>
-
-          <input id="pedidoNombre" type="text" placeholder="Ej. Pedido filtros Noviembre">
-
-        </div>
-
-        <div>
-
-          <label for="pedidoTipoCambio">Tipo de cambio (MXN por 1 USD)</label>
-
-          <input id="pedidoTipoCambio" type="number" step="0.01" min="0" value="19.50">
-
-          <div class="small-note">Se usa para convertir los artículos que vengan en dólares.</div>
-
-        </div>
-
-        <div>
-
-          <label for="pedidoSelect">Seleccionar pedido</label>
-
-          <select id="pedidoSelect"></select>
-
-          <div class="small-note">Elige un pedido existente para ver/editar sus piezas.</div>
-
-        </div>
-
-        <div>
-          <label for="piezaFoto">Foto de la pieza</label>
-          <input id="piezaFoto" type="file" accept="image/*">
-          <div class="small-note">La foto se guarda solo en este dispositivo.</div>
-        </div>
-
-      </div>
-
-      <div style="margin-top:10px;">
-
-        <button id="crearPedidoBtn">Crear nuevo pedido</button>
-
-        <button id="marcarFinalizadoBtn" class="secondary">Marcar pedido como “finalizado”</button>
-
-        <button id="borrarPedidoBtn" class="danger">Borrar pedido actual</button>
-
-      </div>
-
-      <div style="margin-top:8px;">
-
-        <span id="infoPedidoActual" class="small-note"></span>
-
-      </div>
-
-    </div>
-
-
-
-    <!-- SECTION: ADD ITEM -->
-
-    <div class="section">
-
-      <h2>Agregar pieza al pedido actual</h2>
-
-      <div class="grid">
-
-        <div>
-
-          <label for="piezaNombre">Nombre de la pieza</label>
-
-          <input id="piezaNombre" type="text" placeholder="Ej. Espaciadores Charger 1-1/2">
-
-        </div>
-
-        <div>
-
-          <label for="piezaMoneda">Moneda del precio de compra</label>
-
-          <select id="piezaMoneda">
-
-            <option value="USD">Dólares (USD)</option>
-
-            <option value="MXN">Pesos (MXN)</option>
-
-          </select>
-
-        </div>
-
-        <div>
-
-          <label for="piezaPrecioCompra">Precio total pagado</label>
-
-          <input id="piezaPrecioCompra" type="number" step="0.01" min="0" placeholder="Ej. 180">
-
-          <div class="small-note">Si está en USD se convierte con el tipo de cambio del pedido.</div>
-
-        </div>
-
-        <div>
-
-          <label for="piezaCantidad">Cantidad de piezas</label>
-
-          <input id="piezaCantidad" type="number" step="1" min="1" value="1">
-
-        </div>
-
-        <div>
-
-          <label for="piezaPvSugerido">Precio de venta sugerido (MXN)</label>
-
-          <input id="piezaPvSugerido" type="number" step="0.01" min="0" placeholder="Solo informativo">
-
-        </div>
-
-      </div>
-
-      <div style="margin-top:10px;">
-
-        <button id="agregarPiezaBtn">Agregar pieza al pedido</button>
-
-      </div>
-
-    </div>
-
-
-
-    <!-- SECTION: ITEMS TABLE -->
-
-    <div class="section">
-
-      <h2>Piezas del pedido</h2>
-
-      <div class="small-note">
-        Este es el inventario del pedido. Haz clic en una pieza para editarla.
-      </div>
-
-      <div id="tablaPiezasBody" class="inventory-grid">
-        <!-- tarjetas se generan con JS -->
-      </div>
-
-    </div>
-
-
-
-    <!-- SECTION: ORDER SUMMARY -->
-
-
-
-  </div>
-
-  <div class="section">
-
-    <h2>Gastos del pedido</h2>
-
-    <h3 style="margin-top:5px;">Importación</h3>
-    <div class="grid">
+    <div class="form-grid">
       <div>
-        <label for="impMonto">Monto importación (MXN)</label>
-        <input id="impMonto" type="number" step="0.01" min="0" placeholder="Ej. 350">
+        <label for="nombre">Nombre de la pieza</label>
+        <input type="text" id="nombre" placeholder="Ej. Sensor de cigüeñal 300C">
       </div>
+
       <div>
-        <label for="impNota">Comentario (opcional)</label>
-        <input id="impNota" type="text" placeholder="Ej. Aduana, FedEx, etc.">
+        <label for="foto">Foto de la pieza (opcional)</label>
+        <input type="file" id="foto" accept="image/*">
       </div>
-      <div style="align-self:end;">
-        <button id="agregarImportacionBtn">Agregar importación (individual)</button>
+
+      <div>
+        <label for="precioUsd">Precio de la pieza (USD)</label>
+        <input type="number" id="precioUsd" step="0.01" min="0" placeholder="Ej. 45">
+      </div>
+
+      <div>
+        <label for="tipoCambio">Tipo de cambio (MXN por 1 USD)</label>
+        <input type="number" id="tipoCambio" step="0.01" min="0" value="19.50">
+      </div>
+
+      <div>
+        <label for="precioVenta">Precio de venta (MXN)</label>
+        <input type="number" id="precioVenta" step="0.01" min="0" placeholder="Ej. 1600">
+      </div>
+
+      <div>
+        <label for="gastoImportacion">Gastos de importación (MXN)</label>
+        <input type="number" id="gastoImportacion" step="0.01" min="0" placeholder="Si no hubo, deja en 0">
+      </div>
+
+      <div>
+        <label for="gastoPersonal">Gastos personales (MXN)</label>
+        <input type="number" id="gastoPersonal" step="0.01" min="0" placeholder="Gasolina, caseta, etc.">
       </div>
     </div>
 
-    <h3 style="margin-top:15px;">Gastos personales / del local</h3>
-    <div class="grid">
-      <div>
-        <label for="gpMonto">Monto gasto personal (MXN)</label>
-        <input id="gpMonto" type="number" step="0.01" min="0" placeholder="Ej. 200">
-      </div>
-      <div>
-        <label for="gpMotivo">Motivo / razón (obligatorio)</label>
-        <input id="gpMotivo" type="text" placeholder="Ej. comida, pintura del local, etc.">
-      </div>
-      <div style="align-self:end;">
-        <button id="agregarGastoPersonalBtn">Agregar gasto personal</button>
-      </div>
+    <button id="agregarBtn">Agregar al registro</button>
+
+    <div class="botones-secundarios">
+      <button id="guardarTodoBtn">Guardar manualmente</button>
+      <button id="borrarTodoBtn">Borrar todo (local)</button>
     </div>
 
-    <h3 style="margin-top:15px;">Listado de gastos</h3>
     <table>
       <thead>
         <tr>
           <th>#</th>
-          <th>Tipo</th>
-          <th>Monto</th>
-          <th>Motivo / Nota</th>
-          <th>Fecha</th>
+          <th>Foto</th>
+          <th>Nombre</th>
+          <th>Precio USD</th>
+          <th>Tipo cambio</th>
+          <th>Costo en MXN</th>
+          <th>Venta MXN</th>
+          <th>Imp. MXN</th>
+          <th>Pers. MXN</th>
+          <th>Ganancia neta MXN</th>
         </tr>
       </thead>
-      <tbody id="tablaGastosBody">
-        <!-- filas -->
+      <tbody id="tablaBody">
+        <!-- Filas se agregan aquí -->
       </tbody>
     </table>
-  </div>
 
-  <div class="section">
-
-    <h2>Ventas</h2>
-
-    <div class="grid">
-      <div>
-        <label for="ventaNombre">Nombre de la pieza</label>
-        <input id="ventaNombre" type="text" placeholder="Debe coincidir con una pieza del pedido">
-      </div>
-
-      <div>
-        <label for="ventaCantidad">Cantidad vendida</label>
-        <input id="ventaCantidad" type="number" min="1" step="1" placeholder="Ej. 1">
-      </div>
-
-      <div>
-        <label for="ventaPrecio">Precio total vendido (MXN)</label>
-        <input id="ventaPrecio" type="number" step="0.01" min="0" placeholder="Ej. 2500">
-      </div>
-
-      <div style="align-self:end;">
-        <button id="agregarVentaBtn">Registrar venta</button>
-      </div>
-    </div>
-
-    <h3 style="margin-top:15px;">Historial de ventas</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Pieza</th>
-          <th>Cant.</th>
-          <th>Precio total</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody id="tablaVentasBody">
-        <!-- filas -->
-      </tbody>
-    </table>
-  </div>
-
-  <!-- AHORA PEGA AQUÍ EL RESUMEN -->
-  <div class="section resumen">
-
-    <h2>Resumen del pedido</h2>
-
-    <ul>
-
-      <li><strong>Total inversión (costo MXN):</strong> <span id="resTotalInversion">0.00</span></li>
-
-      <li><strong>Total ventas (PV final):</strong> <span id="resTotalVentas">0.00</span></li>
-
-      <li><strong>Total importación:</strong> <span id="resTotalImportacion">0.00</span></li>
-
-      <li><strong>Total gastos:</strong> <span id="resTotalGastos">0.00</span></li>
-
-      <li><strong>Ganancia neta:</strong> <span id="resGananciaNeta">0.00</span></li>
-
-      <li><strong>Ganancia de hoy:</strong> <span id="resGananciaHoy">0.00</span></li>
-      <li><strong>Ganancia de ayer:</strong> <span id="resGananciaAyer">0.00</span></li>
-
-    </ul>
-
-  </div>
-
-  <!-- MODAL EDITAR PIEZA -->
-  <div id="itemModal" class="modal-overlay">
-    <div class="modal">
-      <h3>Editar pieza</h3>
-      <div class="grid">
-        <div>
-          <label for="modalNombre">Nombre</label>
-          <input id="modalNombre" type="text">
-        </div>
-        <div>
-          <label for="modalCantidad">Cantidad</label>
-          <input id="modalCantidad" type="number" min="1" step="1">
-        </div>
-        <div>
-          <label for="modalPrecioTotal">Precio total pagado</label>
-          <input id="modalPrecioTotal" type="number" step="0.01" min="0">
-        </div>
-        <div>
-          <label for="modalPvSugerido">PV sugerido (MXN)</label>
-          <input id="modalPvSugerido" type="number" step="0.01" min="0">
-        </div>
-      </div>
-      <div class="small-note">
-        La ganancia se recalcula sola en el resumen según compras, ventas y gastos. 😎
-      </div>
-      <div class="modal-actions">
-        <button id="modalCancelarBtn" class="secondary">Cancelar</button>
-        <button id="modalGuardarBtn">Guardar cambios</button>
-      </div>
+    <div class="resumen">
+      <h2>Resumen general</h2>
+      <ul>
+        <li><strong>Total invertido en producto (MXN):</strong> <span id="totalCosto">0.00</span></li>
+        <li><strong>Total gastos de importación (MXN):</strong> <span id="totalImp">0.00</span></li>
+        <li><strong>Total gastos personales (MXN):</strong> <span id="totalPers">0.00</span></li>
+        <li><strong>Total ventas (MXN):</strong> <span id="totalVentas">0.00</span></li>
+        <li><strong>Ganancia neta total (MXN):</strong> <span id="totalGanancia">0.00</span></li>
+      </ul>
     </div>
   </div>
-
-  <!-- SONIDOS PERSONALIZADOS -->
-  <audio id="sound-success" src="sounds/Ganancias.m4a" preload="auto"></audio>
-  <audio id="sound-info"   src="sounds/Ganancias.m4a" preload="auto"></audio>
-  <audio id="sound-error"  src="sounds/Error.m4a" preload="auto"></audio>
-  <audio id="sound-warn"   src="sounds/Error.m4a" preload="auto"></audio>
-
-  <!-- TOASTS -->
-  <div id="toastContainer"></div>
 
   <script>
+    // Clave para localStorage
+    const STORAGE_KEY_ITEMS = "inventarioAutopartesItems";
+    const STORAGE_KEY_TIPO_CAMBIO = "inventarioAutopartesTipoCambio";
 
-    // === SUPABASE CONFIG ===
-    const SUPABASE_URL = "https://refqxlyscesqnforopfv.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZnF4bHlzY2VzcW5mb3JvcGZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNDUwOTcsImV4cCI6MjA3ODcyMTA5N30.cUnSQrStS204lkEiDj-bFS4fvflLuUzjRKWxuJ4VI8U";
-    const STORAGE_BUCKET = "autopartes-fotos";
+    // Arreglo global de items
+    let items = [];
 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const tablaBody = document.getElementById("tablaBody");
+    const agregarBtn = document.getElementById("agregarBtn");
+    const guardarTodoBtn = document.getElementById("guardarTodoBtn");
+    const borrarTodoBtn = document.getElementById("borrarTodoBtn");
 
-    // Sube una foto y regresa la URL pública
-    async function subirFotoPieza(file, pedidoId) {
-      if (!file) return null;
+    const totalCostoSpan = document.getElementById("totalCosto");
+    const totalImpSpan = document.getElementById("totalImp");
+    const totalPersSpan = document.getElementById("totalPers");
+    const totalVentasSpan = document.getElementById("totalVentas");
+    const totalGananciaSpan = document.getElementById("totalGanancia");
 
-      const ext = file.name.split(".").pop() || "jpg";
-      const filePath = `${pedidoId}/${uuid()}.${ext}`;
+    const tipoCambioInput = document.getElementById("tipoCambio");
 
-      const { error } = await supabaseClient
-        .storage
-        .from(STORAGE_BUCKET)
-        .upload(filePath, file, { upsert: true });
-
-      if (error) {
-        console.error("Error subiendo foto:", error);
-        showToast("error", "No se pudo subir la foto, apa.");
-        return null;
-      }
-
-      const { data } = supabaseClient
-        .storage
-        .from(STORAGE_BUCKET)
-        .getPublicUrl(filePath);
-
-      return data?.publicUrl || null;
+    function formatMoney(value) {
+      return value.toFixed(2);
     }
 
-    // === THEME LIGHT/DARK ===
-    const THEME_STORAGE_KEY = "apr_tema_pref"; // "auto" | "light" | "dark"
-
-    function updateThemeButtonLabel(theme) {
-      const btn = document.getElementById("toggleThemeBtn");
-      if (!btn) return;
-      if (theme === "light") btn.textContent = "Tema: claro";
-      else if (theme === "dark") btn.textContent = "Tema: oscuro";
-      else btn.textContent = "Tema: automático";
-    }
-
-    function applyTheme(theme) {
-      const root = document.documentElement;
-      if (theme === "light") {
-        root.setAttribute("data-theme", "light");
-      } else if (theme === "dark") {
-        root.setAttribute("data-theme", "dark");
-      } else {
-        // automatic: use system preference
-        root.removeAttribute("data-theme");
-        theme = "auto";
-      }
-      localStorage.setItem(THEME_STORAGE_KEY, theme);
-      updateThemeButtonLabel(theme);
-    }
-
-    // === TOASTS & BEEP ===
-    function playBeep() {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "sine";
-        osc.frequency.value = 880;
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        gain.gain.setValueAtTime(0.15, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.2);
-      } catch (e) {}
-    }
-    function playSoundForToast(type) {
-      let audioId = null;
-      if (type === "success") audioId = "sound-success";
-      else if (type === "info") audioId = "sound-info";
-      else if (type === "warn") audioId = "sound-warn";
-      else if (type === "error") audioId = "sound-error";
-      else audioId = "sound-info";
-
-      const el = document.getElementById(audioId);
-      if (el) {
-        try {
-          el.currentTime = 0;
-          el.play().catch(() => {
-            // autoplay bloqueado, ignorar
-          });
-        } catch (e) {
-          playBeep();
-        }
-      } else {
-        playBeep();
-      }
-    }
-    function showToast(type, message, withSound = false) {
-      const container = document.getElementById("toastContainer");
-      if (!container) return;
-      const div = document.createElement("div");
-      div.classList.add("toast");
-      if (type === "success") div.classList.add("toast-success");
-      else if (type === "info") div.classList.add("toast-info");
-      else if (type === "warn") div.classList.add("toast-warn");
-      else if (type === "error") div.classList.add("toast-error");
-      else div.classList.add("toast-info");
-      div.innerHTML = `
-        <span>${message}</span>
-        <button aria-label="Cerrar">&times;</button>
-      `;
-      const closeBtn = div.querySelector("button");
-      closeBtn.addEventListener("click", () => closeToast(div));
-      container.appendChild(div);
-      if (withSound) playSoundForToast(type);
-      setTimeout(() => closeToast(div), 3500);
-    }
-    function closeToast(el) {
-      el.style.animation = "toast-out 0.2s forwards";
-      setTimeout(() => {
-        if (el.parentNode) el.parentNode.removeChild(el);
-      }, 220);
-    }
-
-    // === DATA & LOCALSTORAGE ===
-
-    const STORAGE_KEY_PEDIDOS = "apr_pedidos_v1";
-
-
-
-    /**
-
-     * Structure:
-
-     * pedidos = [
-
-     *   {
-
-     *     id, nombre, tipoCambio, finalizado,
-
-     *     items: [
-
-     *       {
-
-     *         id, nombre, moneda, precioCompra,
-
-     *         costoMx, pvSugerido, pvFinal,
-
-     *         importacion, gastos, ganancia
-
-     *       }
-
-     *     ]
-
-     *   }
-
-     * ]
-
-     */
-
-    let pedidos = [];
-
-    let pedidoActualId = null;
-
-
-
-    // === DOM ELEMENTS ===
-
-    const pedidoNombreInput = document.getElementById("pedidoNombre");
-
-    const pedidoTipoCambioInput = document.getElementById("pedidoTipoCambio");
-
-    const pedidoSelect = document.getElementById("pedidoSelect");
-    const toggleThemeBtn = document.getElementById("toggleThemeBtn");
-
-    const crearPedidoBtn = document.getElementById("crearPedidoBtn");
-
-    const marcarFinalizadoBtn = document.getElementById("marcarFinalizadoBtn");
-
-    const borrarPedidoBtn = document.getElementById("borrarPedidoBtn");
-
-    const infoPedidoActualSpan = document.getElementById("infoPedidoActual");
-
-
-
-    const piezaNombreInput = document.getElementById("piezaNombre");
-
-    const piezaMonedaSelect = document.getElementById("piezaMoneda");
-
-    const piezaPrecioCompraInput = document.getElementById("piezaPrecioCompra");
-    const piezaCantidadInput = document.getElementById("piezaCantidad");
-
-    const piezaPvSugeridoInput = document.getElementById("piezaPvSugerido");
-    const piezaFotoInput = document.getElementById("piezaFoto");
-
-    const agregarPiezaBtn = document.getElementById("agregarPiezaBtn");
-
-
-
-    const tablaPiezasBody = document.getElementById("tablaPiezasBody");
-
-    // GASTOS
-    const impMontoInput = document.getElementById("impMonto");
-    const impNotaInput = document.getElementById("impNota");
-    const gpMontoInput = document.getElementById("gpMonto");
-    const gpMotivoInput = document.getElementById("gpMotivo");
-    const agregarImportacionBtn = document.getElementById("agregarImportacionBtn");
-    const agregarGastoPersonalBtn = document.getElementById("agregarGastoPersonalBtn");
-    const tablaGastosBody = document.getElementById("tablaGastosBody");
-
-    // VENTAS
-    const ventaNombreInput = document.getElementById("ventaNombre");
-    const ventaCantidadInput = document.getElementById("ventaCantidad");
-    const ventaPrecioInput = document.getElementById("ventaPrecio");
-    const agregarVentaBtn = document.getElementById("agregarVentaBtn");
-    const tablaVentasBody = document.getElementById("tablaVentasBody");
-
-    // MODAL PIEZA
-    const itemModal = document.getElementById("itemModal");
-    const modalNombreInput = document.getElementById("modalNombre");
-    const modalCantidadInput = document.getElementById("modalCantidad");
-    const modalPrecioTotalInput = document.getElementById("modalPrecioTotal");
-    const modalPvSugeridoInput = document.getElementById("modalPvSugerido");
-    const modalGuardarBtn = document.getElementById("modalGuardarBtn");
-    const modalCancelarBtn = document.getElementById("modalCancelarBtn");
-
-    let itemEditId = null;
-
-
-    const resTotalInversionSpan = document.getElementById("resTotalInversion");
-
-    const resTotalVentasSpan = document.getElementById("resTotalVentas");
-
-    const resTotalImportacionSpan = document.getElementById("resTotalImportacion");
-
-    const resTotalGastosSpan = document.getElementById("resTotalGastos");
-
-    const resGananciaNetaSpan = document.getElementById("resGananciaNeta");
-    const resGananciaHoySpan = document.getElementById("resGananciaHoy");
-    const resGananciaAyerSpan = document.getElementById("resGananciaAyer");
-
-
-
-    // === UTILITIES ===
-
-    function uuid() {
-
-      return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
-
-    }
-
-    function money(n) {
-
-      return (n || 0).toFixed(2);
-
-    }
-
-    let lastFotoDataUrl = null;
-
-
-    function guardarLocal() {
-
-      try {
-
-        localStorage.setItem(STORAGE_KEY_PEDIDOS, JSON.stringify({
-
-          pedidos,
-
-          pedidoActualId
-
-        }));
-
-      } catch (e) {
-
-        console.error("Error guardando en localStorage", e);
-
-      }
-
-    }
-
-
-
-    function cargarLocal() {
-
-      try {
-
-        const raw = localStorage.getItem(STORAGE_KEY_PEDIDOS);
-
-        if (!raw) return;
-
-        const data = JSON.parse(raw);
-
-        if (Array.isArray(data.pedidos)) {
-
-          pedidos = data.pedidos.map(p => ({
-            ...p,
-            gastosImportacion: p.gastosImportacion || [],
-            gastosPersonales: p.gastosPersonales || [],
-            ventas: p.ventas || []
-          }));
-
-        }
-
-        if (data.pedidoActualId) {
-
-          pedidoActualId = data.pedidoActualId;
-
-        }
-
-      } catch (e) {
-
-        console.error("Error cargando localStorage", e);
-
-      }
-
-    }
-
-
-
-    function getPedidoActual() {
-
-      return pedidos.find(p => p.id === pedidoActualId) || null;
-
-    }
-
-
-
-    // === RENDERING ===
-
-    function renderPedidosSelect() {
-
-      pedidoSelect.innerHTML = "";
-
-      if (pedidos.length === 0) {
-
-        const opt = document.createElement("option");
-
-        opt.value = "";
-
-        opt.textContent = "Sin pedidos";
-
-        pedidoSelect.appendChild(opt);
-
-        infoPedidoActualSpan.textContent = "Crea un nuevo pedido para comenzar.";
-
-        return;
-
-      }
-
-
-
-      pedidos.forEach(p => {
-
-        const opt = document.createElement("option");
-
-        opt.value = p.id;
-
-        opt.textContent = p.nombre;
-
-        pedidoSelect.appendChild(opt);
-
+    function actualizarResumen() {
+      let totalCosto = 0;
+      let totalImp = 0;
+      let totalPers = 0;
+      let totalVentas = 0;
+      let totalGanancia = 0;
+
+      items.forEach(item => {
+        totalCosto += item.costoMx;
+        totalImp += item.gastoImportacion;
+        totalPers += item.gastoPersonal;
+        totalVentas += item.precioVenta;
+        totalGanancia += item.ganancia;
       });
 
-
-
-      if (!pedidoActualId || !pedidos.some(p => p.id === pedidoActualId)) {
-
-        pedidoActualId = pedidos[0].id;
-
-      }
-
-      pedidoSelect.value = pedidoActualId;
-
+      totalCostoSpan.textContent = formatMoney(totalCosto);
+      totalImpSpan.textContent = formatMoney(totalImp);
+      totalPersSpan.textContent = formatMoney(totalPers);
+      totalVentasSpan.textContent = formatMoney(totalVentas);
+      totalGananciaSpan.textContent = formatMoney(totalGanancia);
     }
 
+    function agregarFilaTabla(item, index) {
+      const tr = document.createElement("tr");
 
+      const tdIndex = document.createElement("td");
+      tdIndex.textContent = index + 1;
 
-    function renderResumenPedido(pedido) {
-
-      if (!pedido) {
-
-        resTotalInversionSpan.textContent = "0.00";
-
-        resTotalVentasSpan.textContent = "0.00";
-
-        resTotalImportacionSpan.textContent = "0.00";
-
-        resTotalGastosSpan.textContent = "0.00";
-
-        resGananciaNetaSpan.textContent = "0.00";
-
-        infoPedidoActualSpan.textContent = "Sin pedido seleccionado.";
-
-        return;
-
+      const tdFoto = document.createElement("td");
+      if (item.fotoDataUrl) {
+        const img = document.createElement("img");
+        img.src = item.fotoDataUrl;
+        tdFoto.appendChild(img);
+      } else {
+        tdFoto.textContent = "-";
       }
 
+      const tdNombre = document.createElement("td");
+      tdNombre.textContent = item.nombre || "-";
 
+      const tdPrecioUsd = document.createElement("td");
+      tdPrecioUsd.textContent = formatMoney(item.precioUsd);
 
-      let totalInversion = 0;
+      const tdTipoCambio = document.createElement("td");
+      tdTipoCambio.textContent = formatMoney(item.tipoCambio);
 
-      let totalVentas = 0;
+      const tdCostoMx = document.createElement("td");
+      tdCostoMx.textContent = formatMoney(item.costoMx);
 
-      let totalImportacion = 0;
+      const tdVenta = document.createElement("td");
+      tdVenta.textContent = formatMoney(item.precioVenta);
 
-      let totalGastos = 0;
+      const tdImp = document.createElement("td");
+      tdImp.textContent = formatMoney(item.gastoImportacion);
 
-      let gananciaNeta = 0;
+      const tdPers = document.createElement("td");
+      tdPers.textContent = formatMoney(item.gastoPersonal);
 
-      let gananciaHoy = 0;
-      let gananciaAyer = 0;
+      const tdGanancia = document.createElement("td");
+      tdGanancia.textContent = formatMoney(item.ganancia);
 
-      const hoy = new Date();
-      const ayer = new Date();
-      ayer.setDate(hoy.getDate() - 1);
-      function esMismoDia(d1, d2) {
-        return d1.getFullYear() === d2.getFullYear() &&
-               d1.getMonth() === d2.getMonth() &&
-               d1.getDate() === d2.getDate();
+      tr.appendChild(tdIndex);
+      tr.appendChild(tdFoto);
+      tr.appendChild(tdNombre);
+      tr.appendChild(tdPrecioUsd);
+      tr.appendChild(tdTipoCambio);
+      tr.appendChild(tdCostoMx);
+      tr.appendChild(tdVenta);
+      tr.appendChild(tdImp);
+      tr.appendChild(tdPers);
+      tr.appendChild(tdGanancia);
+
+      tablaBody.appendChild(tr);
+    }
+
+    function repintarTabla() {
+      tablaBody.innerHTML = "";
+      items.forEach((it, idx) => agregarFilaTabla(it, idx));
+    }
+
+    // ----- LOCALSTORAGE -----
+    function guardarEnLocalStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(items));
+        localStorage.setItem(STORAGE_KEY_TIPO_CAMBIO, tipoCambioInput.value || "");
+      } catch (e) {
+        console.error("Error guardando en localStorage:", e);
       }
+    }
 
-
-      pedido.items.forEach(item => {
-
-        totalInversion += item.costoMx || 0;
-
-        totalVentas += item.pvFinal || 0;
-
-        totalImportacion += item.importacion || 0;
-
-        totalGastos += item.gastos || 0;
-
-        gananciaNeta += item.ganancia || 0;
-
-        if (item.createdAt) {
-          const fecha = new Date(item.createdAt);
-          if (esMismoDia(fecha, hoy)) {
-            gananciaHoy += item.ganancia || 0;
-          } else if (esMismoDia(fecha, ayer)) {
-            gananciaAyer += item.ganancia || 0;
+    function cargarDesdeLocalStorage() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEY_ITEMS);
+        if (data) {
+          const parsed = JSON.parse(data);
+          if (Array.isArray(parsed)) {
+            items = parsed;
           }
         }
 
-      });
-
-
-
-      // sumar gastos de la nueva sección
-      if (pedido.gastosImportacion) {
-        pedido.gastosImportacion.forEach(g => {
-          totalImportacion += g.monto || 0;
-        });
-      }
-      if (pedido.gastosPersonales) {
-        pedido.gastosPersonales.forEach(g => {
-          totalGastos += g.monto || 0;
-        });
-      }
-
-      // sumar ventas registradas
-      if (pedido.ventas) {
-        pedido.ventas.forEach(v => {
-          totalVentas += v.precioTotal || 0;
-        });
-      }
-
-      // calcular ganancia neta sobre totales
-      gananciaNeta = totalVentas - totalInversion - totalImportacion - totalGastos;
-
-      resTotalInversionSpan.textContent = money(totalInversion);
-      resTotalVentasSpan.textContent = money(totalVentas);
-      resTotalImportacionSpan.textContent = money(totalImportacion);
-      resTotalGastosSpan.textContent = money(totalGastos);
-      resGananciaNetaSpan.textContent = money(gananciaNeta);
-      if (resGananciaHoySpan) resGananciaHoySpan.textContent = money(gananciaHoy);
-      if (resGananciaAyerSpan) resGananciaAyerSpan.textContent = money(gananciaAyer);
-
-
-
-      const status = pedido.finalizado ? "Finalizado" : "Abierto";
-
-      infoPedidoActualSpan.innerHTML =
-
-        `Pedido actual: <strong>${pedido.nombre}</strong> | Tipo de cambio: <strong>${money(pedido.tipoCambio)}</strong> | Estado: ` +
-
-        (pedido.finalizado
-
-          ? `<span class="badge badge-closed">Finalizado</span>`
-
-          : `<span class="badge badge-open">Abierto</span>`);
-
-    }
-
-
-
-    function renderTablaPiezas(pedido) {
-      tablaPiezasBody.innerHTML = "";
-
-      if (!pedido || !pedido.items.length) {
-        const empty = document.createElement("div");
-        empty.textContent = "No hay piezas en este pedido.";
-        empty.className = "small-note";
-        tablaPiezasBody.appendChild(empty);
-        return;
-      }
-
-      pedido.items.forEach((item, idx) => {
-        const card = document.createElement("div");
-        card.className = "item-card";
-        card.dataset.itemId = item.id;
-
-        // HEADER: foto + título
-        const header = document.createElement("div");
-        header.className = "item-card-header";
-
-        let img;
-        if (item.foto) {
-          img = document.createElement("img");
-          img.src = item.foto;
-          img.alt = item.nombre || "Pieza";
-          img.className = "item-photo";
-        } else {
-          img = document.createElement("div");
-          img.className = "item-photo placeholder";
-          img.textContent = "Sin foto";
+        const savedTipoCambio = localStorage.getItem(STORAGE_KEY_TIPO_CAMBIO);
+        if (savedTipoCambio) {
+          tipoCambioInput.value = savedTipoCambio;
         }
+      } catch (e) {
+        console.error("Error cargando desde localStorage:", e);
+      }
 
-        const headerText = document.createElement("div");
-        const title = document.createElement("div");
-        title.className = "item-title";
-        title.textContent = item.nombre || "(Sin nombre)";
-
-        const sub = document.createElement("div");
-        sub.className = "item-sub";
-        sub.textContent = `Moneda: ${item.moneda || "-"} · #${idx + 1}`;
-
-        const pillRow = document.createElement("div");
-        pillRow.className = "item-pill-row";
-        const pillStock = document.createElement("span");
-        pillStock.className = "pill " + ((item.cantidad || 0) > 0 ? "pill-stock" : "pill-out");
-        pillStock.textContent = (item.cantidad || 0) > 0 ? "STOCK" : "AGOTADO";
-
-        const pillCant = document.createElement("span");
-        pillCant.className = "pill";
-        pillCant.textContent = `Cant: ${item.cantidad || 0}`;
-
-        pillRow.appendChild(pillStock);
-        pillRow.appendChild(pillCant);
-
-        headerText.appendChild(title);
-        headerText.appendChild(sub);
-        headerText.appendChild(pillRow);
-
-        header.appendChild(img);
-        header.appendChild(headerText);
-
-        // BODY: datos numéricos
-        const body = document.createElement("div");
-        body.className = "item-card-body";
-
-        const costoUnitMx = (item.cantidad || 0) > 0 ? (item.costoMx || 0) / (item.cantidad || 1) : 0;
-
-        function block(label, value) {
-          const div = document.createElement("div");
-          const lbl = document.createElement("span");
-          lbl.className = "item-label";
-          lbl.textContent = label;
-          const val = document.createElement("span");
-          val.textContent = value;
-          div.appendChild(lbl);
-          div.appendChild(val);
-          return div;
-        }
-
-        body.appendChild(block("Costo total (MXN)", `$ ${money(item.costoMx || 0)}`));
-        body.appendChild(block("Costo unit. (MXN)", `$ ${money(costoUnitMx)}`));
-        body.appendChild(block("PV sugerido", item.pvSugerido ? `$ ${money(item.pvSugerido)}` : "-"));
-
-        // Footer: botón editar
-        const footer = document.createElement("div");
-        footer.className = "item-edit-row";
-        const editBtn = document.createElement("button");
-        editBtn.className = "secondary item-edit-btn";
-        editBtn.textContent = "Editar";
-        editBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          openItemModal(item.id);
-        });
-        footer.appendChild(editBtn);
-
-        card.appendChild(header);
-        card.appendChild(body);
-        card.appendChild(footer);
-
-        // Click en tarjeta también abre modal
-        card.addEventListener("click", () => openItemModal(item.id));
-
-        tablaPiezasBody.appendChild(card);
-      });
+      repintarTabla();
+      actualizarResumen();
     }
 
-    function renderGastos(pedido) {
-      tablaGastosBody.innerHTML = "";
-      if (!pedido) {
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = 5;
-        td.textContent = "No hay pedido seleccionado.";
-        tr.appendChild(td);
-        tablaGastosBody.appendChild(tr);
+    function procesarRegistro(fotoDataUrl) {
+      const nombre = document.getElementById("nombre").value.trim();
+      const precioUsd = parseFloat(document.getElementById("precioUsd").value) || 0;
+      const tipoCambio = parseFloat(tipoCambioInput.value) || 0;
+      const precioVenta = parseFloat(document.getElementById("precioVenta").value) || 0;
+      const gastoImportacion = parseFloat(document.getElementById("gastoImportacion").value) || 0;
+      const gastoPersonal = parseFloat(document.getElementById("gastoPersonal").value) || 0;
+
+      if (!precioUsd || !tipoCambio || !precioVenta) {
+        alert("Por favor llena al menos: Precio USD, Tipo de cambio y Precio de venta.");
         return;
       }
 
-      const filas = [];
-      if (pedido.gastosImportacion) {
-        pedido.gastosImportacion.forEach(g => {
-          filas.push({
-            tipo: "Importación",
-            monto: g.monto || 0,
-            motivo: g.nota || "",
-            fecha: g.fecha || ""
-          });
-        });
-      }
-      if (pedido.gastosPersonales) {
-        pedido.gastosPersonales.forEach(g => {
-          filas.push({
-            tipo: "Gasto personal",
-            monto: g.monto || 0,
-            motivo: g.motivo || "",
-            fecha: g.fecha || ""
-          });
-        });
-      }
+      const costoMx = precioUsd * tipoCambio;
+      const ganancia = precioVenta - costoMx - gastoImportacion - gastoPersonal;
 
-      if (!filas.length) {
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = 5;
-        td.textContent = "No hay gastos registrados para este pedido.";
-        tr.appendChild(td);
-        tablaGastosBody.appendChild(tr);
-        return;
-      }
-
-      filas.forEach((f, idx) => {
-        const tr = document.createElement("tr");
-        function td(text) {
-          const td = document.createElement("td");
-          td.textContent = text;
-          return td;
-        }
-        tr.appendChild(td(idx + 1));
-        tr.appendChild(td(f.tipo));
-        tr.appendChild(td(money(f.monto)));
-        tr.appendChild(td(f.motivo || "-"));
-        tr.appendChild(td(f.fecha ? new Date(f.fecha).toLocaleDateString() : "-"));
-        tablaGastosBody.appendChild(tr);
-      });
-    }
-
-    function renderVentas(pedido) {
-      tablaVentasBody.innerHTML = "";
-
-      if (!pedido || !pedido.ventas || !pedido.ventas.length) {
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = 5;
-        td.textContent = "No hay ventas registradas.";
-        tr.appendChild(td);
-        tablaVentasBody.appendChild(tr);
-        return;
-      }
-
-      pedido.ventas.forEach((v, idx) => {
-        const tr = document.createElement("tr");
-        function td(text) {
-          const td = document.createElement("td");
-          td.textContent = text;
-          return td;
-        }
-        tr.appendChild(td(idx + 1));
-        tr.appendChild(td(v.nombre));
-        tr.appendChild(td(v.cantidadVendida));
-        tr.appendChild(td(money(v.precioTotal)));
-        tr.appendChild(td(new Date(v.fecha).toLocaleDateString()));
-        tablaVentasBody.appendChild(tr);
-      });
-    }
-
-
-    function openItemModal(itemId) {
-      const pedido = getPedidoActual();
-      if (!pedido) return;
-      const item = pedido.items.find(i => i.id === itemId);
-      if (!item) return;
-
-      itemEditId = item.id;
-      modalNombreInput.value = item.nombre || "";
-      modalCantidadInput.value = item.cantidad || 1;
-      modalPrecioTotalInput.value = item.precioTotal || 0;
-      modalPvSugeridoInput.value = item.pvSugerido || 0;
-
-      itemModal.style.display = "flex";
-    }
-
-    function closeItemModal() {
-      itemEditId = null;
-      itemModal.style.display = "none";
-    }
-
-    function renderTodo() {
-
-      renderPedidosSelect();
-
-      const pedido = getPedidoActual();
-
-      renderTablaPiezas(pedido);
-      renderGastos(pedido);
-      renderVentas(pedido);
-      renderResumenPedido(pedido);
-
-      guardarLocal();
-
-    }
-
-
-
-    // === PROFIT CALCULATION ===
-
-    function recalcularGanancia(item) {
-      // Only compute if pvFinal is provided
-      if (item.pvFinal == null) {
-        item.ganancia = 0;
-        return;
-      }
-      const pvFinal = item.pvFinal || 0;
-      const importacion = item.importacion || 0;
-      const gastos = item.gastos || 0;
-      const costoMx = item.costoMx || 0;
-      item.ganancia = pvFinal - costoMx - importacion - gastos;
-
-    }
-
-
-
-    // === EVENTS ===
-    if (toggleThemeBtn) {
-      toggleThemeBtn.addEventListener("click", () => {
-        const current = localStorage.getItem(THEME_STORAGE_KEY) || "auto";
-        let next;
-        if (current === "auto") next = "dark";
-        else if (current === "dark") next = "light";
-        else next = "auto";
-        applyTheme(next);
-      });
-    }
-
-    crearPedidoBtn.addEventListener("click", () => {
-
-      const nombre = pedidoNombreInput.value.trim();
-
-      const tc = parseFloat(pedidoTipoCambioInput.value) || 0;
-
-
-
-      if (!nombre) {
-
-        showToast("warn", "Ponle un nombre al pedido, apa.");
-
-        return;
-
-      }
-
-      if (!tc) {
-
-        showToast("warn", "Pon un tipo de cambio válido.");
-
-        return;
-
-      }
-
-
-
-      const nuevoPedido = {
-
-        id: uuid(),
-
+      const item = {
         nombre,
-
-        tipoCambio: tc,
-
-        finalizado: false,
-
-        items: [],
-        gastosImportacion: [],
-        gastosPersonales: [],
-        ventas: []
-
+        fotoDataUrl: fotoDataUrl || null,
+        precioUsd,
+        tipoCambio,
+        costoMx,
+        precioVenta,
+        gastoImportacion,
+        gastoPersonal,
+        ganancia
       };
 
-      pedidos.push(nuevoPedido);
+      items.push(item);
 
-      pedidoActualId = nuevoPedido.id;
+      repintarTabla();
+      actualizarResumen();
+      guardarEnLocalStorage(); // guardamos cada vez que agregas
 
-      pedidoNombreInput.value = "";
+      // Limpiar inputs (menos tipo de cambio)
+      document.getElementById("nombre").value = "";
+      document.getElementById("precioUsd").value = "";
+      document.getElementById("precioVenta").value = "";
+      document.getElementById("gastoImportacion").value = "";
+      document.getElementById("gastoPersonal").value = "";
+      document.getElementById("foto").value = "";
+    }
 
-      renderTodo();
-      showToast("success", "Nuevo pedido creado, apa ✔️", true);
+    agregarBtn.addEventListener("click", () => {
+      const fotoInput = document.getElementById("foto");
+      const file = fotoInput.files[0];
 
-    });
+      // También guardamos cualquier cambio al tipo de cambio
+      guardarEnLocalStorage();
 
-
-
-    pedidoSelect.addEventListener("change", () => {
-
-      const id = pedidoSelect.value;
-
-      pedidoActualId = id || null;
-
-      const pedido = getPedidoActual();
-
-      if (pedido) {
-
-        pedidoTipoCambioInput.value = pedido.tipoCambio || 19.5;
-
-      }
-
-      renderTodo();
-
-    });
-
-
-
-    marcarFinalizadoBtn.addEventListener("click", () => {
-
-      const pedido = getPedidoActual();
-
-      if (!pedido) {
-
-        showToast("warn", "No hay pedido seleccionado.");
-
-        return;
-
-      }
-
-      pedido.finalizado = !pedido.finalizado;
-
-      renderTodo();
-      showToast(
-        "info",
-        pedido.finalizado
-          ? "Pedido marcado como finalizado ✅"
-          : "Pedido reabierto, sigue la talacha 🔄"
-      );
-
-    });
-
-
-
-    borrarPedidoBtn.addEventListener("click", () => {
-
-      const pedido = getPedidoActual();
-
-      if (!pedido) {
-
-        showToast("warn", "No hay pedido seleccionado.");
-
-        return;
-
-      }
-
-      const confirmar = confirm(
-
-        `¿Seguro que quieres borrar el pedido "${pedido.nombre}" con todas sus piezas?`
-
-      );
-
-      if (!confirmar) return;
-
-      pedidos = pedidos.filter(p => p.id !== pedido.id);
-
-      pedidoActualId = pedidos.length ? pedidos[0].id : null;
-
-      renderTodo();
-      showToast("error", "Pedido borrado, apa. Ya no hay vuelta atrás. 🗑️");
-
-    });
-
-
-
-    if (piezaFotoInput) {
-      piezaFotoInput.addEventListener("change", (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (!file) {
-          lastFotoDataUrl = null;
-          return;
-        }
+      if (file) {
         const reader = new FileReader();
-        reader.onload = (ev) => {
-          lastFotoDataUrl = ev.target && ev.target.result ? ev.target.result : null;
+        reader.onload = function(e) {
+          const dataUrl = e.target.result;
+          procesarRegistro(dataUrl);
         };
         reader.readAsDataURL(file);
-      });
-    }
-
-    agregarPiezaBtn.addEventListener("click", async () => {
-
-      const pedido = getPedidoActual();
-
-      if (!pedido) {
-
-        showToast("warn", "Primero crea o selecciona un pedido.");
-
-        return;
-
-      }
-
-
-
-      const nombre = piezaNombreInput.value.trim();
-
-      const moneda = piezaMonedaSelect.value;
-
-      // precio total pagado
-
-      const precioTotal = parseFloat(piezaPrecioCompraInput.value) || 0;
-
-      const cantidad = parseFloat(piezaCantidadInput.value) || 1;
-
-      // precio unitario = precioTotal / cantidad
-
-      const precioUnitario = cantidad > 0 ? (precioTotal / cantidad) : 0;
-
-      const pvSugerido = parseFloat(piezaPvSugeridoInput.value) || 0;
-
-
-
-      if (!nombre) {
-
-        showToast("warn", "Ponle nombre a la pieza, apa.");
-
-        return;
-
-      }
-
-      if (!precioTotal) {
-
-        showToast("warn", "Precio de compra inválido, chécalo bien.");
-
-        return;
-
-      }
-
-
-
-      const tipoCambio = pedido.tipoCambio || 0;
-
-      // unit cost in MXN
-
-      let costoUnitMx = precioUnitario;
-
-      if (moneda === "USD") {
-
-        if (!tipoCambio) {
-
-          showToast("error", "El pedido no tiene tipo de cambio válido.");
-
-          return;
-
-        }
-
-        costoUnitMx = precioUnitario * tipoCambio;
-
-      }
-
-      // total line cost
-
-      const costoMx = costoUnitMx * cantidad;
-
-
-
-      // subir foto a Supabase (opcional)
-      let fotoUrl = null;
-      if (piezaFotoInput && piezaFotoInput.files && piezaFotoInput.files[0]) {
-        fotoUrl = await subirFotoPieza(piezaFotoInput.files[0], pedido.id);
-      }
-
-      const nuevaPieza = {
-
-        id: uuid(),
-
-        nombre,
-
-        moneda,
-
-        precioTotal,        // lo que tú pagaste en total
-
-        precioUnitario,     // calculado por el sistema
-
-        cantidad,
-
-        costoMx,            // total en MXN
-
-        pvSugerido: pvSugerido || null,
-
-        foto: fotoUrl || null,
-
-        ganancia: 0,
-
-        createdAt: new Date().toISOString()
-
-      };
-
-
-
-      pedido.items.push(nuevaPieza);
-
-
-
-      // clear form
-
-      piezaNombreInput.value = "";
-
-      piezaPrecioCompraInput.value = "";
-
-      piezaCantidadInput.value = "1";
-
-      piezaPvSugeridoInput.value = "";
-
-      if (piezaFotoInput) piezaFotoInput.value = "";
-      lastFotoDataUrl = null;
-
-
-      renderTodo();
-
-      showToast("success", "Simón, pieza agregada al pedido. ✔️", true);
-
-    });
-    agregarImportacionBtn.addEventListener("click", () => {
-      const pedido = getPedidoActual();
-      if (!pedido) {
-        showToast("warn", "No hay pedido seleccionado, apa.");
-        return;
-      }
-      const monto = parseFloat(impMontoInput.value) || 0;
-      const nota = impNotaInput.value.trim();
-      if (!monto) {
-        showToast("warn", "Pon un monto válido de importación.");
-        return;
-      }
-      pedido.gastosImportacion.push({
-        id: uuid(),
-        monto,
-        nota,
-        fecha: new Date().toISOString()
-      });
-      impMontoInput.value = "";
-      impNotaInput.value = "";
-      showToast("info", "Gasto de importación agregado (individual) ✔️", true);
-      renderTodo();
-    });
-
-    agregarGastoPersonalBtn.addEventListener("click", () => {
-      const pedido = getPedidoActual();
-      if (!pedido) {
-        showToast("warn", "No hay pedido seleccionado, apa.");
-        return;
-      }
-      const monto = parseFloat(gpMontoInput.value) || 0;
-      const motivo = gpMotivoInput.value.trim();
-      if (!monto) {
-        showToast("warn", "Pon un monto válido para el gasto personal.");
-        return;
-      }
-      if (!motivo) {
-        showToast("warn", "Describe el motivo del gasto personal, apa.");
-        return;
-      }
-      pedido.gastosPersonales.push({
-        id: uuid(),
-        monto,
-        motivo,
-        fecha: new Date().toISOString()
-      });
-      gpMontoInput.value = "";
-      gpMotivoInput.value = "";
-      showToast("info", "Gasto personal registrado ✔️", true);
-      renderTodo();
-    });
-
-    agregarVentaBtn.addEventListener("click", () => {
-      const pedido = getPedidoActual();
-      if (!pedido) {
-        showToast("warn", "No hay pedido seleccionado, apa.");
-        return;
-      }
-
-      const nombre = ventaNombreInput.value.trim();
-      const cantidadVendida = parseFloat(ventaCantidadInput.value) || 0;
-      const precioTotal = parseFloat(ventaPrecioInput.value) || 0;
-
-      if (!nombre) {
-        showToast("warn", "Pon el nombre de la pieza vendida.");
-        return;
-      }
-      if (!cantidadVendida) {
-        showToast("warn", "Cantidad vendida inválida.");
-        return;
-      }
-      if (!precioTotal) {
-        showToast("warn", "Pon un precio válido.");
-        return;
-      }
-
-      pedido.ventas.push({
-        id: uuid(),
-        nombre,
-        cantidadVendida,
-        precioTotal,
-        fecha: new Date().toISOString()
-      });
-
-      ventaNombreInput.value = "";
-      ventaCantidadInput.value = "";
-      ventaPrecioInput.value = "";
-
-      showToast("success", "Venta registrada ✔️", true);
-      renderTodo();
-    });
-
-
-    modalCancelarBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      closeItemModal();
-    });
-
-    modalGuardarBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      const pedido = getPedidoActual();
-      if (!pedido || !itemEditId) {
-        closeItemModal();
-        return;
-      }
-      const item = pedido.items.find(i => i.id === itemEditId);
-      if (!item) {
-        closeItemModal();
-        return;
-      }
-
-      const nuevoNombre = modalNombreInput.value.trim();
-      const nuevaCant = parseFloat(modalCantidadInput.value) || 1;
-      const nuevoPrecioTotal = parseFloat(modalPrecioTotalInput.value) || 0;
-      const nuevoPvSug = parseFloat(modalPvSugeridoInput.value) || 0;
-
-      if (!nuevoNombre) {
-        showToast("warn", "Ponle nombre a la pieza, apa.");
-        return;
-      }
-      if (!nuevoPrecioTotal) {
-        showToast("warn", "Precio total inválido.");
-        return;
-      }
-
-      item.nombre = nuevoNombre;
-      item.cantidad = nuevaCant;
-      item.precioTotal = nuevoPrecioTotal;
-      item.pvSugerido = nuevoPvSug || null;
-
-      // recalcular unitario y costoMx
-      const precioUnitario = nuevaCant > 0 ? (nuevoPrecioTotal / nuevaCant) : 0;
-      item.precioUnitario = precioUnitario;
-      const tipoCambio = getPedidoActual().tipoCambio || 0;
-      let costoUnitMx = precioUnitario;
-      if (item.moneda === "USD" && tipoCambio) {
-        costoUnitMx = precioUnitario * tipoCambio;
-      }
-      item.costoMx = costoUnitMx * nuevaCant;
-
-      closeItemModal();
-      renderTodo();
-      showToast("success", "Pieza actualizada ✔️", true);
-    });
-
-    // cerrar modal si clic fuera
-    itemModal.addEventListener("click", (e) => {
-      if (e.target === itemModal) {
-        closeItemModal();
+      } else {
+        procesarRegistro(null);
       }
     });
 
-
-    function onEditarCampoPieza(e) {
-
-      const input = e.target;
-
-      const itemId = input.dataset.itemId;
-
-      const field = input.dataset.field;
-
-
-
-      const pedido = getPedidoActual();
-
-      if (!pedido) return;
-
-      const item = pedido.items.find(it => it.id === itemId);
-
-      if (!item) return;
-
-
-
-      const value = parseFloat(input.value) || 0;
-
-      if (["pvSugerido"].includes(field)) {
-
-        item[field] = value;
-
-      }
-
-
-
-      recalcularGanancia(item);
-
-      renderTodo();
-
-    }
-
-
-
-    // === INIT ===
-
-    document.addEventListener("DOMContentLoaded", () => {
-
-      cargarLocal();
-
-      renderTodo();
-
-      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || "auto";
-      applyTheme(savedTheme);
-
+    guardarTodoBtn.addEventListener("click", () => {
+      guardarEnLocalStorage();
+      alert("Datos guardados en este navegador.");
     });
 
+    borrarTodoBtn.addEventListener("click", () => {
+      const confirmar = confirm("¿Seguro que quieres borrar todo el registro guardado en este navegador?");
+      if (!confirmar) return;
+
+      items = [];
+      repintarTabla();
+      actualizarResumen();
+      localStorage.removeItem(STORAGE_KEY_ITEMS);
+      // Puedes decidir si también borrar el tipo de cambio:
+      // localStorage.removeItem(STORAGE_KEY_TIPO_CAMBIO);
+    });
+
+    // Cargar al iniciar
+    document.addEventListener("DOMContentLoaded", cargarDesdeLocalStorage);
   </script>
-
 </body>
-
 </html>
-
-
